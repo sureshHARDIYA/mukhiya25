@@ -1,4 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { BookIcon } from "lucide-react";
 
 /**
  * Shared layout configurations
@@ -176,5 +177,13 @@ m-711 -59 c2 -6 -14 -20 -36 -31 -43 -23 -74 -21 -141 11 l-35 17 54 -5 c29
     ),
   },
   // see https://fumadocs.dev/docs/ui/navigation/links
-  links: [],
+  links: [
+    {
+      icon: <BookIcon />,
+      text: "Blog",
+      url: "/docs",
+      // secondary items will be displayed differently on navbar
+      secondary: false,
+    },
+  ],
 };
