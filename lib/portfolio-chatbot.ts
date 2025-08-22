@@ -3,6 +3,7 @@ import {
   getFollowUpQuestions as getConfiguredFollowUpQuestions,
   getFollowUpAnswer,
 } from "./follow-up-config";
+import { githubService } from "./github-service";
 
 export interface SkillCategory {
   name: string;
@@ -35,6 +36,12 @@ export interface Project {
   technologies: string[];
   link?: string;
   image?: string;
+  // GitHub-specific fields
+  stars?: number;
+  forks?: number;
+  language?: string;
+  lastUpdated?: string;
+  homepage?: string;
 }
 
 export interface ResearchPaper {
@@ -208,6 +215,57 @@ export const portfolioData = {
   },
 };
 
+// Function to get projects from GitHub (with fallback to static data)
+export async function getProjects(): Promise<Project[]> {
+  try {
+    // Try to fetch from GitHub first
+    const githubProjects = await githubService.getFeaturedProjects([
+      "mukhiya25", // Portfolio website
+      "trygno-ui-storybook", // UI components storybook
+      "idpt", // Digital platform project
+      "phd-resources", // PhD resources
+      "min-blog", // Minimalist blog
+      "skmbooks", // Books platform
+      "web-components", // Web components library
+      "skm-components", // Component library
+    ]);
+
+    // Convert GitHub projects to Project format, preserving GitHub data
+    const convertedProjects: Project[] = githubProjects.map((project) => ({
+      name: project.name,
+      description: project.description,
+      technologies: project.technologies,
+      link: project.link,
+      image: undefined, // Could add repo social preview image later
+      // Preserve GitHub-specific data
+      stars: project.stars,
+      forks: project.forks,
+      language: project.language,
+      lastUpdated: project.lastUpdated,
+      homepage: project.homepage,
+    }));
+
+    // If we got projects from GitHub, return them
+    if (convertedProjects.length > 0) {
+      return convertedProjects;
+    }
+  } catch (error) {
+    console.error("Failed to fetch GitHub projects:", error);
+  }
+
+  // Fallback to static projects if GitHub fails
+  return portfolioData.projects;
+}
+
+// Function to get updated portfolio data with GitHub projects
+export async function getUpdatedPortfolioData() {
+  const projects = await getProjects();
+  return {
+    ...portfolioData,
+    projects,
+  };
+}
+
 // Predefined Q&A system
 export const predefinedQA = {
   "What are Suresh's technical skills?": {
@@ -258,7 +316,7 @@ export const predefinedQA = {
   },
 };
 
-// Enhanced response generation
+// Enhanced response generation with GitHub integration
 export async function generateResponse(query: string): Promise<{
   type: "predefined" | "custom" | "email_request";
   response: string;
@@ -279,6 +337,20 @@ export async function generateResponse(query: string): Promise<{
   // Check for exact match with predefined questions
   const exactMatch = predefinedQA[query as keyof typeof predefinedQA];
   if (exactMatch) {
+    // Special handling for projects to get GitHub data
+    if (exactMatch.type === "projects") {
+      const projects = await getProjects();
+      return {
+        type: "predefined",
+        response: exactMatch.textResponse,
+        data: {
+          ...exactMatch,
+          data: projects,
+        },
+        followUpQuestions: getFollowUpQuestions(exactMatch.type),
+      };
+    }
+
     return {
       type: "predefined",
       response: exactMatch.textResponse,
@@ -341,6 +413,21 @@ export async function generateResponse(query: string): Promise<{
 
       if (matchingQA) {
         const [, qaData] = matchingQA;
+
+        // Special handling for projects to get GitHub data
+        if (qaData.type === "projects") {
+          const projects = await getProjects();
+          return {
+            type: "predefined",
+            response: qaData.textResponse,
+            data: {
+              ...qaData,
+              data: projects,
+            },
+            followUpQuestions: getFollowUpQuestions(qaData.type),
+          };
+        }
+
         return {
           type: "predefined",
           response: qaData.textResponse,

@@ -15,6 +15,7 @@ import {
 import RichResponse from "@/components/chatbot/RichResponse";
 import EmailCollector from "@/components/chatbot/EmailCollector";
 import FollowUpQuestionsAdmin from "@/components/chatbot/FollowUpQuestionsAdmin";
+import TypingIndicator from "@/components/chatbot/TypingIndicator";
 
 interface ChatMessage {
   id: number;
@@ -52,6 +53,7 @@ export default function HomePage() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   // Ref for auto-scrolling to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -98,6 +100,9 @@ export default function HomePage() {
     setMessages(updatedMessages);
     setInputValue("");
 
+    // Show typing indicator
+    setIsTyping(true);
+
     // Create or update chat history
     let chatId = currentChatId;
     if (!chatId) {
@@ -105,9 +110,17 @@ export default function HomePage() {
       setCurrentChatId(chatId);
     }
 
+    // Add a realistic delay for thinking animation
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1000 + Math.random() * 1500)
+    ); // 1-2.5 second delay
+
     // Generate intelligent bot response
     try {
       const response = await generateResponse(message);
+
+      // Hide typing indicator
+      setIsTyping(false);
 
       const botResponse: ChatMessage = {
         id: Date.now() + 1,
@@ -145,6 +158,9 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error("Error generating response:", error);
+
+      // Hide typing indicator on error
+      setIsTyping(false);
 
       // Fallback response
       const botResponse: ChatMessage = {
@@ -429,6 +445,21 @@ export default function HomePage() {
                       )}
                     </div>
                   ))}
+
+                  {/* Typing indicator */}
+                  {isTyping && (
+                    <div className="flex gap-4 justify-start">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="max-w-4xl">
+                        <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl px-4 py-3">
+                          <TypingIndicator />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Invisible element for auto-scrolling */}
                   <div ref={messagesEndRef} />
                 </div>
