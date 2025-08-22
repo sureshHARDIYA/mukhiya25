@@ -2,12 +2,39 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Menu, Bot, Send, User, MessageSquare, Trash2, X } from "lucide-react";
+import {
+  generateResponse,
+  suggestedQuestions,
+  saveCustomQuestion,
+  SkillCategory,
+  Education,
+  Experience,
+  Project,
+  ResearchPaper,
+} from "@/lib/portfolio-chatbot";
+import RichResponse from "@/components/chatbot/RichResponse";
+import EmailCollector from "@/components/chatbot/EmailCollector";
+import FollowUpQuestionsAdmin from "@/components/chatbot/FollowUpQuestionsAdmin";
 
 interface ChatMessage {
   id: number;
   text: string;
   isUser: boolean;
   timestamp: Date;
+  type?: "predefined" | "custom" | "email_request";
+  data?: {
+    type: string;
+    data:
+      | SkillCategory[]
+      | Education[]
+      | Experience[]
+      | Project[]
+      | ResearchPaper[]
+      | { summary: string; highlights: string[] };
+    textResponse: string;
+  };
+  followUpQuestions?: string[];
+  requiresEmail?: boolean;
 }
 
 interface ChatHistory {
@@ -17,14 +44,7 @@ interface ChatHistory {
   lastUpdated: Date;
 }
 
-const predefinedPrompts = [
-  "Tell me about your academic background",
-  "What are your research interests?",
-  "What programming languages do you know?",
-  "What projects have you worked on?",
-  "Tell me about your professional experience",
-  "What are your current goals?",
-];
+const predefinedPrompts = suggestedQuestions;
 
 export default function HomePage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -64,7 +84,7 @@ export default function HomePage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
 
     const newMessage: ChatMessage = {
@@ -85,13 +105,19 @@ export default function HomePage() {
       setCurrentChatId(chatId);
     }
 
-    // Simulate bot response
-    setTimeout(() => {
+    // Generate intelligent bot response
+    try {
+      const response = await generateResponse(message);
+
       const botResponse: ChatMessage = {
         id: Date.now() + 1,
-        text: "Thanks for your question! I'll help you learn more about Suresh Kumar Mukhiya. This is a placeholder response - we'll implement the AI API soon.",
+        text: response.response,
         isUser: false,
         timestamp: new Date(),
+        type: response.type,
+        data: response.data,
+        followUpQuestions: response.followUpQuestions,
+        requiresEmail: response.requiresEmail,
       };
 
       const finalMessages = [...updatedMessages, botResponse];
@@ -117,7 +143,20 @@ export default function HomePage() {
       if (typeof window !== "undefined") {
         localStorage.setItem("chatHistory", JSON.stringify(newHistory));
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Error generating response:", error);
+
+      // Fallback response
+      const botResponse: ChatMessage = {
+        id: Date.now() + 1,
+        text: "I apologize, but I'm having trouble generating a response right now. Please try asking again!",
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      const finalMessages = [...updatedMessages, botResponse];
+      setMessages(finalMessages);
+    }
   };
 
   const clearChatHistory = () => {
@@ -295,19 +334,92 @@ export default function HomePage() {
                       )}
 
                       <div
-                        className={`max-w-3xl rounded-2xl px-4 py-3 ${
-                          message.isUser
-                            ? "bg-blue-500 text-white ml-12"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        }`}
+                        className={`max-w-4xl ${message.isUser ? "ml-12" : ""}`}
                       >
-                        <p className="whitespace-pre-wrap">{message.text}</p>
-                        <p className="text-xs opacity-70 mt-2">
-                          {message.timestamp.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                        {message.isUser ? (
+                          <div className="bg-blue-500 text-white rounded-2xl px-4 py-3">
+                            <p className="whitespace-pre-wrap">
+                              {message.text}
+                            </p>
+                            <p className="text-xs opacity-70 mt-2">
+                              {message.timestamp.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                          </div>
+                        ) : (
+                          <div>
+                            {/* Text response */}
+                            <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl px-4 py-3 mb-2">
+                              <p className="whitespace-pre-wrap">
+                                {message.text}
+                              </p>
+                              <p className="text-xs opacity-70 mt-2">
+                                {message.timestamp.toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            </div>
+
+                            {/* Rich response component */}
+                            {message.type === "predefined" && message.data && (
+                              <RichResponse responseData={message.data} />
+                            )}
+
+                            {/* Follow-up questions */}
+                            {message.followUpQuestions &&
+                              message.followUpQuestions.length > 0 && (
+                                <div className="mt-4">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
+                                    💡 You might also want to ask:
+                                  </p>
+                                  <div className="grid grid-cols-1 gap-2">
+                                    {message.followUpQuestions.map(
+                                      (question, index) => (
+                                        <button
+                                          key={index}
+                                          onClick={() =>
+                                            handleSendMessage(question)
+                                          }
+                                          className="text-left p-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group bg-white dark:bg-gray-800/30"
+                                        >
+                                          <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300">
+                                            {question}
+                                          </span>
+                                        </button>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                            {/* Email collector for custom questions */}
+                            {message.requiresEmail && (
+                              <EmailCollector
+                                question={
+                                  messages[messages.indexOf(message) - 1]
+                                    ?.text || ""
+                                }
+                                onSubmit={(email) => {
+                                  console.log("Email submitted:", email);
+                                  // Save the question with email
+                                  saveCustomQuestion(
+                                    messages[messages.indexOf(message) - 1]
+                                      ?.text || "",
+                                    email
+                                  );
+                                  // You can add a success message here
+                                }}
+                                onSkip={() => {
+                                  console.log("Email collection skipped");
+                                  // Just continue the conversation
+                                }}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {message.isUser && (
@@ -365,6 +477,9 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      {/* Uncomment the line below to enable follow-up questions admin panel */}
+      <FollowUpQuestionsAdmin />
     </div>
   );
 }
