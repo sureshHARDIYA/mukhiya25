@@ -43,10 +43,10 @@ export default function HomePage() {
       if (savedHistory) {
         try {
           const parsed = JSON.parse(savedHistory);
-          const historyWithDates = parsed.map((chat: any) => ({
+          const historyWithDates = parsed.map((chat: ChatHistory) => ({
             ...chat,
             lastUpdated: new Date(chat.lastUpdated),
-            messages: chat.messages.map((msg: any) => ({
+            messages: chat.messages.map((msg: ChatMessage) => ({
               ...msg,
               timestamp: new Date(msg.timestamp),
             })),
