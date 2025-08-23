@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Menu, Bot, Send, User, MessageSquare, Trash2, X } from "lucide-react";
 import {
-  generateResponse,
   suggestedQuestions,
   saveCustomQuestion,
   SkillCategory,
@@ -115,9 +114,22 @@ export default function HomePage() {
       setTimeout(resolve, 1000 + Math.random() * 1500)
     ); // 1-2.5 second delay
 
-    // Generate intelligent bot response
+    // Generate intelligent bot response using new NLP-powered API
     try {
-      const response = await generateResponse(message);
+      // Call the new API route instead of the old generateResponse
+      const apiResponse = await fetch("/api/chat/respond", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: message }),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error(`API response not ok: ${apiResponse.status}`);
+      }
+
+      const response = await apiResponse.json();
 
       // Hide typing indicator
       setIsTyping(false);
