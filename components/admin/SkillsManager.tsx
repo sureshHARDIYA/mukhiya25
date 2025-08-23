@@ -14,7 +14,6 @@ interface SkillFormData {
 }
 
 export const SkillsManager: React.FC = () => {
-  const supabase = createClient();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
@@ -33,19 +32,20 @@ export const SkillsManager: React.FC = () => {
 
   const fetchSkills = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("skills")
-      .select("*")
-      .order("category_name", { ascending: true })
-      .order("sort_order", { ascending: true });
-
-    if (error) {
+    try {
+      const response = await fetch('/api/admin/skills');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSkills(data.skills || []);
+      } else {
+        console.error("Error fetching skills:", data.error);
+      }
+    } catch (error) {
       console.error("Error fetching skills:", error);
-    } else {
-      setSkills(data || []);
     }
     setLoading(false);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchSkills();
@@ -54,42 +54,56 @@ export const SkillsManager: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingSkill) {
-      // Update existing skill
-      const { error } = await supabase
-        .from("skills")
-        .update({
-          ...formData,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", editingSkill.id);
+    try {
+      if (editingSkill) {
+        // Update existing skill
+        const response = await fetch(`/api/admin/skills?id=${editingSkill.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-      if (error) {
-        console.error("Error updating skill:", error);
+        const data = await response.json();
+        
+        if (response.ok) {
+          setEditingSkill(null);
+          fetchSkills();
+        } else {
+          console.error("Error updating skill:", data.error);
+        }
       } else {
-        setEditingSkill(null);
-        fetchSkills();
-      }
-    } else {
-      // Create new skill
-      const { error } = await supabase.from("skills").insert([formData]);
+        // Create new skill
+        const response = await fetch('/api/admin/skills', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-      if (error) {
-        console.error("Error creating skill:", error);
-      } else {
-        setShowAddForm(false);
-        fetchSkills();
+        const data = await response.json();
+        
+        if (response.ok) {
+          setShowAddForm(false);
+          fetchSkills();
+        } else {
+          console.error("Error creating skill:", data.error);
+        }
       }
+
+      // Reset form
+      setFormData({
+        category_name: "",
+        skill_name: "",
+        skill_level: 5,
+        color: "#3B82F6",
+        sort_order: 0,
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
-
-    // Reset form
-    setFormData({
-      category_name: "",
-      skill_name: "",
-      skill_level: 5,
-      color: "#3B82F6",
-      sort_order: 0,
-    });
   };
 
   const handleEdit = (skill: Skill) => {
@@ -107,12 +121,20 @@ export const SkillsManager: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this skill?")) return;
 
-    const { error } = await supabase.from("skills").delete().eq("id", id);
+    try {
+      const response = await fetch(`/api/admin/skills?id=${id}`, {
+        method: 'DELETE',
+      });
 
-    if (error) {
+      const data = await response.json();
+      
+      if (response.ok) {
+        fetchSkills();
+      } else {
+        console.error("Error deleting skill:", data.error);
+      }
+    } catch (error) {
       console.error("Error deleting skill:", error);
-    } else {
-      fetchSkills();
     }
   };
 
