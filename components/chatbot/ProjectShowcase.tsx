@@ -68,8 +68,7 @@ export default function ProjectShowcase({ projects }: ProjectShowcaseProps) {
               </div>
 
               {/* GitHub Stats */}
-              {(project.stars !== undefined ||
-                project.forks !== undefined) && (
+              {(project.stars !== undefined || project.forks !== undefined) && (
                 <div className="flex items-center gap-4 mb-3 text-xs text-gray-500 dark:text-gray-400">
                   {project.stars !== undefined && (
                     <div className="flex items-center gap-1">

@@ -391,7 +391,7 @@ export default function HomePage() {
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
                                     💡 You might also want to ask:
                                   </p>
-                                  <div className="grid grid-cols-1 gap-2">
+                                  <div className="flex flex-wrap gap-2">
                                     {message.followUpQuestions.map(
                                       (question, index) => (
                                         <button
@@ -399,9 +399,9 @@ export default function HomePage() {
                                           onClick={() =>
                                             handleSendMessage(question)
                                           }
-                                          className="text-left p-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group bg-white dark:bg-gray-800/30"
+                                          className="inline-flex items-center px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group bg-white dark:bg-gray-800/30 flex-shrink-0"
                                         >
-                                          <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300">
+                                          <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300 whitespace-nowrap">
                                             {question}
                                           </span>
                                         </button>
