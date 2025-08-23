@@ -36,10 +36,11 @@ export const PersonalInfoManager: React.FC = () => {
   useEffect(() => {
     const fetchPersonalInfo = async () => {
       setLoading(true);
-    const { data, error } = await supabase
-      .from("personal_info_structured")
-      .select("*")
-      .single();      if (error && error.code !== "PGRST116") {
+      const { data, error } = await supabase
+        .from("personal_info_structured")
+        .select("*")
+        .single();
+      if (error && error.code !== "PGRST116") {
         console.error("Error fetching personal info:", error);
       } else if (data) {
         setInfo(data);

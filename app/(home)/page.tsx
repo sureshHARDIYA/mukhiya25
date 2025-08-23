@@ -109,14 +109,9 @@ export default function HomePage() {
       setCurrentChatId(chatId);
     }
 
-    // Add a realistic delay for thinking animation
-    await new Promise((resolve) =>
-      setTimeout(resolve, 1000 + Math.random() * 1500)
-    ); // 1-2.5 second delay
-
     // Generate intelligent bot response using new NLP-powered API
     try {
-      // Call the new API route instead of the old generateResponse
+      // Call the new API route - thinking indicator will show for actual processing time
       const apiResponse = await fetch("/api/chat/respond", {
         method: "POST",
         headers: {

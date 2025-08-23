@@ -58,7 +58,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 lg:hidden">
-          <div 
+          <div
             className="fixed inset-0 bg-gray-600 bg-opacity-75"
             onClick={() => setSidebarOpen(false)}
           />
@@ -71,14 +71,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            
+
             <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
               <div className="flex-shrink-0 flex items-center px-4 mb-8">
-                <h1 className="text-xl font-bold text-gray-900">
-                  Admin Panel
-                </h1>
+                <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
               </div>
-              
+
               <nav className="px-3">
                 <div className="space-y-1">
                   {adminTabs.map((tab) => {
@@ -107,10 +105,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 </div>
               </nav>
             </div>
-            
+
             {/* Mobile user info */}
             <div className="flex-shrink-0 border-t border-gray-200 p-4">
-              <div className="flex items-center">
+              <div className="flex items-center mb-3">
                 <div className="flex-shrink-0">
                   <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
                     <Users className="h-4 w-4 text-indigo-600" />
@@ -122,14 +120,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   </p>
                   <p className="text-xs text-gray-500">Administrator</p>
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  className="ml-3 p-1 text-gray-400 hover:text-red-600 transition-colors"
-                  title="Sign out"
-                >
-                  <LogOut className="h-5 w-5" />
-                </button>
               </div>
+
+              {/* Prominent mobile logout button */}
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </button>
             </div>
           </div>
         </div>
@@ -140,11 +140,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="flex flex-col w-64 bg-white shadow-sm border-r border-gray-200">
           <div className="flex flex-col h-screen">
             <div className="flex items-center flex-shrink-0 px-6 py-6 border-b border-gray-200">
-              <h1 className="text-xl font-bold text-gray-900">
-                Admin Panel
-              </h1>
+              <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
             </div>
-            
+
             <div className="flex-1 pt-6 pb-4 overflow-y-auto">
               <nav className="px-3">
                 <div className="space-y-1">
@@ -163,9 +161,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                           }
                         `}
                       >
-                        <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                          activeTab === tab.id ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
-                        }`} />
+                        <Icon
+                          className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                            activeTab === tab.id
+                              ? "text-indigo-600"
+                              : "text-gray-400 group-hover:text-gray-600"
+                          }`}
+                        />
                         {tab.label}
                       </button>
                     );
@@ -176,7 +178,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
             {/* Desktop user info */}
             <div className="flex-shrink-0 border-t border-gray-200 p-4">
-              <div className="flex items-center">
+              <div className="flex items-center mb-3">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
                     <Users className="h-5 w-5 text-indigo-600" />
@@ -188,14 +190,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   </p>
                   <p className="text-xs text-gray-500">Administrator</p>
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  className="ml-3 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
               </div>
+
+              {/* Prominent logout button */}
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </button>
             </div>
           </div>
         </div>
@@ -232,9 +236,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <main className="flex-1 overflow-y-auto bg-gray-50">
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="space-y-6">
-                {children}
-              </div>
+              <div className="space-y-6">{children}</div>
             </div>
           </div>
         </main>

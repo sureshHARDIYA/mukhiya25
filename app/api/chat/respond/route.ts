@@ -7,7 +7,12 @@ import {
 } from "@/lib/intent-detector";
 import { supabase, type Response } from "@/lib/supabase";
 import { getProjects } from "@/lib/portfolio-chatbot";
-import { portfolioData } from "@/lib/portfolio-chatbot";
+import { 
+  getSkills, 
+  getEducation, 
+  getExperience, 
+  getResearch 
+} from "@/lib/portfolio-chatbot-dynamic";
 import { validateChatInput, sanitizeForDatabase } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -136,29 +141,39 @@ async function enhanceResponseWithDynamicData(
         textResponse: response.response_text,
       };
     }
-    // For other types, use static data from portfolio-chatbot
+    // For skills, get dynamic data from database
     else if (response.response_type === "skills") {
+      const skills = await getSkills();
       enhancedResponse.response_data = {
         type: "skills",
-        data: portfolioData.skills,
+        data: skills,
         textResponse: response.response_text,
       };
-    } else if (response.response_type === "experience") {
+    } 
+    // For experience, get dynamic data from database
+    else if (response.response_type === "experience") {
+      const experience = await getExperience();
       enhancedResponse.response_data = {
         type: "experience",
-        data: portfolioData.experience,
+        data: experience,
         textResponse: response.response_text,
       };
-    } else if (response.response_type === "education") {
+    } 
+    // For education, get dynamic data from database
+    else if (response.response_type === "education") {
+      const education = await getEducation();
       enhancedResponse.response_data = {
         type: "education",
-        data: portfolioData.education,
+        data: education,
         textResponse: response.response_text,
       };
-    } else if (response.response_type === "research") {
+    } 
+    // For research, get dynamic data from database
+    else if (response.response_type === "research") {
+      const research = await getResearch();
       enhancedResponse.response_data = {
         type: "research",
-        data: portfolioData.research,
+        data: research,
         textResponse: response.response_text,
       };
     }

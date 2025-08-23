@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Edit, Trash2, Save, X, BookOpen, ExternalLink, Calendar } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  BookOpen,
+  ExternalLink,
+  Calendar,
+} from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 interface Research {
@@ -103,7 +112,8 @@ export const ResearchManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this research entry?")) return;
+    if (!confirm("Are you sure you want to delete this research entry?"))
+      return;
 
     try {
       const { error } = await supabase.from("research").delete().eq("id", id);
@@ -135,7 +145,9 @@ export const ResearchManager: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
@@ -147,7 +159,10 @@ export const ResearchManager: React.FC = () => {
   };
 
   const handleArrayChange = (field: keyof Research, value: string) => {
-    const array = value.split(",").map(item => item.trim()).filter(item => item);
+    const array = value
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item);
     setFormData((prev) => ({ ...prev, [field]: array }));
   };
 
@@ -174,7 +189,9 @@ export const ResearchManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Research Publications</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Research Publications
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Manage your research papers and academic publications.
           </p>
@@ -192,7 +209,9 @@ export const ResearchManager: React.FC = () => {
       {research.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No research publications</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No research publications
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Get started by adding your research work.
           </p>
@@ -200,25 +219,35 @@ export const ResearchManager: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {research.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-6">
+            <div
+              key={item.id}
+              className="bg-white rounded-lg border border-gray-200 p-6"
+            >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
-                    <h4 className="text-lg font-semibold text-gray-900">{item.title}</h4>
+                    <h4 className="text-lg font-semibold text-gray-900">
+                      {item.title}
+                    </h4>
                     {item.featured && (
                       <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
                         Featured
                       </span>
                     )}
-                    <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(item.status)}`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs ${getStatusBadge(
+                        item.status
+                      )}`}
+                    >
                       {item.status.replace("_", " ").toUpperCase()}
                     </span>
                   </div>
-                  
+
                   <div className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">Authors:</span> {item.authors.join(", ")}
+                    <span className="font-medium">Authors:</span>{" "}
+                    {item.authors.join(", ")}
                   </div>
-                  
+
                   <div className="flex items-center text-sm text-gray-500 mb-3 space-x-4">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
@@ -229,7 +258,9 @@ export const ResearchManager: React.FC = () => {
                     )}
                   </div>
 
-                  <p className="text-gray-700 mb-3 line-clamp-3">{item.abstract}</p>
+                  <p className="text-gray-700 mb-3 line-clamp-3">
+                    {item.abstract}
+                  </p>
 
                   {item.keywords && item.keywords.length > 0 && (
                     <div className="mb-3">
@@ -247,9 +278,7 @@ export const ResearchManager: React.FC = () => {
                   )}
 
                   <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    {item.doi && (
-                      <span>DOI: {item.doi}</span>
-                    )}
+                    {item.doi && <span>DOI: {item.doi}</span>}
                     {item.paper_url && (
                       <a
                         href={item.paper_url}
@@ -263,7 +292,7 @@ export const ResearchManager: React.FC = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex space-x-2 ml-4">
                   <button
                     onClick={() => handleEdit(item)}
@@ -340,7 +369,9 @@ export const ResearchManager: React.FC = () => {
                   <input
                     type="text"
                     value={formData.authors.join(", ")}
-                    onChange={(e) => handleArrayChange("authors", e.target.value)}
+                    onChange={(e) =>
+                      handleArrayChange("authors", e.target.value)
+                    }
                     required
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="John Doe, Jane Smith, Bob Wilson"
@@ -427,7 +458,9 @@ export const ResearchManager: React.FC = () => {
                   <input
                     type="text"
                     value={formData.keywords.join(", ")}
-                    onChange={(e) => handleArrayChange("keywords", e.target.value)}
+                    onChange={(e) =>
+                      handleArrayChange("keywords", e.target.value)
+                    }
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="machine learning, artificial intelligence, neural networks"
                   />
@@ -443,7 +476,10 @@ export const ResearchManager: React.FC = () => {
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="featured"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       Featured research
                     </label>
                   </div>

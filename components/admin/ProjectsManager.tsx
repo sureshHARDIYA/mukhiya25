@@ -2,7 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { Plus, Edit, Trash2, Save, X, FolderOpen, ExternalLink, Github, Calendar } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  FolderOpen,
+  ExternalLink,
+  Github,
+  Calendar,
+} from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 interface Project {
@@ -148,14 +158,20 @@ export const ProjectsManager: React.FC = () => {
   };
 
   const handleTechnologiesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const technologies = e.target.value.split(",").map(tech => tech.trim()).filter(tech => tech);
+    const technologies = e.target.value
+      .split(",")
+      .map((tech) => tech.trim())
+      .filter((tech) => tech);
     setFormData((prev) => ({ ...prev, technologies }));
   };
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+    });
   };
 
   if (loading) {
@@ -189,7 +205,9 @@ export const ProjectsManager: React.FC = () => {
       {projects.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <FolderOpen className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No projects</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No projects
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Get started by adding your first project.
           </p>
@@ -197,7 +215,10 @@ export const ProjectsManager: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
-            <div key={project.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div
+              key={project.id}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            >
               {project.image_url && (
                 <div className="h-48 bg-gray-200 relative">
                   <Image
@@ -208,7 +229,7 @@ export const ProjectsManager: React.FC = () => {
                   />
                 </div>
               )}
-              
+
               <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-lg font-semibold text-gray-900 truncate">
@@ -234,7 +255,10 @@ export const ProjectsManager: React.FC = () => {
 
                 <div className="flex items-center text-sm text-gray-500 mb-3">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {formatDate(project.start_date)} - {project.is_ongoing ? "Present" : formatDate(project.end_date || "")}
+                  {formatDate(project.start_date)} -{" "}
+                  {project.is_ongoing
+                    ? "Present"
+                    : formatDate(project.end_date || "")}
                 </div>
 
                 {project.technologies && project.technologies.length > 0 && (
@@ -280,7 +304,7 @@ export const ProjectsManager: React.FC = () => {
                       </a>
                     )}
                   </div>
-                  
+
                   <div className="flex space-x-1">
                     <button
                       onClick={() => handleEdit(project)}
@@ -444,11 +468,14 @@ export const ProjectsManager: React.FC = () => {
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="is_ongoing" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="is_ongoing"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       This project is ongoing
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -458,7 +485,10 @@ export const ProjectsManager: React.FC = () => {
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="featured"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       Featured project
                     </label>
                   </div>

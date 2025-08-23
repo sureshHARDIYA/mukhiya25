@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Edit, Trash2, Save, X, Briefcase, Calendar, MapPin } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Briefcase,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 interface Experience {
@@ -75,7 +84,9 @@ export const ExperienceManager: React.FC = () => {
         setEditingItem(null);
       } else {
         // Create new experience
-        const { error } = await supabase.from("experience").insert([submitData]);
+        const { error } = await supabase
+          .from("experience")
+          .insert([submitData]);
         if (error) throw error;
         setShowAddForm(false);
       }
@@ -95,7 +106,8 @@ export const ExperienceManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this experience entry?")) return;
+    if (!confirm("Are you sure you want to delete this experience entry?"))
+      return;
 
     try {
       const { error } = await supabase.from("experience").delete().eq("id", id);
@@ -137,7 +149,10 @@ export const ExperienceManager: React.FC = () => {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { year: "numeric", month: "short" });
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+    });
   };
 
   if (loading) {
@@ -171,7 +186,9 @@ export const ExperienceManager: React.FC = () => {
       {experiences.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No work experience</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No work experience
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Get started by adding your work experience.
           </p>
@@ -179,15 +196,23 @@ export const ExperienceManager: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {experiences.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-6">
+            <div
+              key={item.id}
+              className="bg-white rounded-lg border border-gray-200 p-6"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h4 className="text-lg font-medium text-gray-900">{item.position}</h4>
+                  <h4 className="text-lg font-medium text-gray-900">
+                    {item.position}
+                  </h4>
                   <p className="text-indigo-600 font-medium">{item.company}</p>
                   <div className="flex items-center mt-2 text-sm text-gray-500 space-x-4">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {formatDate(item.start_date)} - {item.is_current ? "Present" : formatDate(item.end_date || "")}
+                      {formatDate(item.start_date)} -{" "}
+                      {item.is_current
+                        ? "Present"
+                        : formatDate(item.end_date || "")}
                     </div>
                     <div className="flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />
@@ -201,7 +226,9 @@ export const ExperienceManager: React.FC = () => {
                   </div>
                   {item.description && (
                     <div className="mt-3">
-                      <p className="text-gray-700 whitespace-pre-line">{item.description}</p>
+                      <p className="text-gray-700 whitespace-pre-line">
+                        {item.description}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -313,7 +340,10 @@ export const ExperienceManager: React.FC = () => {
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="is_current" className="ml-2 block text-sm text-gray-900">
+                    <label
+                      htmlFor="is_current"
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       This is my current position
                     </label>
                   </div>

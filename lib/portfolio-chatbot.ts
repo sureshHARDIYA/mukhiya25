@@ -52,168 +52,23 @@ export interface ResearchPaper {
   link?: string;
 }
 
-// Comprehensive portfolio data
-export const portfolioData = {
-  skills: [
-    {
-      name: "Frontend Development",
-      skills: [
-        { name: "React", level: 9, color: "#61DAFB" },
-        { name: "Next.js", level: 9, color: "#000000" },
-        { name: "TypeScript", level: 8, color: "#3178C6" },
-        { name: "Vue.js", level: 7, color: "#4FC08D" },
-        { name: "Tailwind CSS", level: 9, color: "#06B6D4" },
-        { name: "Angular", level: 6, color: "#DD0031" },
-      ],
-    },
-    {
-      name: "Backend Development",
-      skills: [
-        { name: "Node.js", level: 9, color: "#339933" },
-        { name: "Python", level: 8, color: "#3776AB" },
-        { name: "Django", level: 8, color: "#092E20" },
-        { name: "FastAPI", level: 7, color: "#009688" },
-        { name: "Express.js", level: 9, color: "#000000" },
-        { name: "Spring Boot", level: 6, color: "#6DB33F" },
-      ],
-    },
-    {
-      name: "Database & Cloud",
-      skills: [
-        { name: "PostgreSQL", level: 8, color: "#336791" },
-        { name: "MongoDB", level: 7, color: "#47A248" },
-        { name: "AWS", level: 8, color: "#FF9900" },
-        { name: "Docker", level: 8, color: "#2496ED" },
-        { name: "Kubernetes", level: 6, color: "#326CE5" },
-        { name: "Redis", level: 7, color: "#DC382D" },
-      ],
-    },
-    {
-      name: "AI & Machine Learning",
-      skills: [
-        { name: "TensorFlow", level: 7, color: "#FF6F00" },
-        { name: "PyTorch", level: 6, color: "#EE4C2C" },
-        { name: "scikit-learn", level: 8, color: "#F7931E" },
-        { name: "OpenAI APIs", level: 8, color: "#412991" },
-        { name: "Hugging Face", level: 7, color: "#FFD21E" },
-      ],
-    },
-  ] as SkillCategory[],
+export interface QAData {
+  type: string;
+  data: SkillCategory[] | Education[] | Experience[] | Project[] | ResearchPaper[] | { summary: string; highlights: string[] };
+  textResponse: string;
+}
 
-  education: [
-    {
-      degree: "PhD in Computer Science",
-      institution: "University Name",
-      year: "2023",
-      description:
-        "Specialization in Digital Health Solutions and AI applications in Healthcare. Research focus on software engineering methodologies for health technology.",
-      status: "completed",
-    },
-    {
-      degree: "Master of Science in Software Engineering",
-      institution: "University Name",
-      year: "2019",
-      description:
-        "Advanced studies in software architecture, distributed systems, and modern development methodologies.",
-      status: "completed",
-    },
-    {
-      degree: "Bachelor of Engineering in Computer Science",
-      institution: "University Name",
-      year: "2017",
-      description:
-        "Foundation in computer science principles, programming, and software development.",
-      status: "completed",
-    },
-  ] as Education[],
+export interface QACollection {
+  [key: string]: QAData;
+}
 
-  experience: [
-    {
-      title: "Senior Software Engineer",
-      company: "Tech Company",
-      duration: "2022 - Present",
-      description: [
-        "Led development of scalable web applications serving 100K+ users",
-        "Architected microservices infrastructure reducing response time by 40%",
-        "Mentored junior developers and established coding best practices",
-        "Collaborated with cross-functional teams to deliver high-quality products",
-      ],
-      technologies: ["React", "Node.js", "PostgreSQL", "AWS", "Docker"],
-    },
-    {
-      title: "Full Stack Developer",
-      company: "Healthcare Startup",
-      duration: "2020 - 2022",
-      description: [
-        "Developed AI-powered healthcare solutions improving patient outcomes",
-        "Built real-time data processing systems handling medical records",
-        "Implemented secure authentication and data encryption protocols",
-        "Created responsive web applications with modern UI/UX practices",
-      ],
-      technologies: ["Python", "Django", "React", "PostgreSQL", "TensorFlow"],
-    },
-    {
-      title: "Research Assistant",
-      company: "University Research Lab",
-      duration: "2018 - 2020",
-      description: [
-        "Conducted research on digital health technologies and AI applications",
-        "Published papers in peer-reviewed international conferences",
-        "Developed prototypes for healthcare technology solutions",
-        "Collaborated with medical professionals on technology integration",
-      ],
-      technologies: ["Python", "Machine Learning", "Data Analysis", "Research"],
-    },
-  ] as Experience[],
-
-  projects: [
-    {
-      name: "AI-Powered Healthcare Dashboard",
-      description:
-        "Real-time healthcare analytics platform with predictive insights for patient care optimization.",
-      technologies: ["React", "Python", "TensorFlow", "PostgreSQL", "AWS"],
-      link: "https://github.com/suresh/healthcare-dashboard",
-    },
-    {
-      name: "Portfolio Website with AI Chatbot",
-      description:
-        "Modern portfolio website featuring an intelligent chatbot for visitor interaction and lead generation.",
-      technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Vercel"],
-      link: "https://sureshmukhiya.com",
-    },
-    {
-      name: "Open Source Development Tools",
-      description:
-        "Collection of developer productivity tools and libraries used by the open source community.",
-      technologies: ["Node.js", "TypeScript", "CLI Tools", "NPM"],
-      link: "https://github.com/suresh/dev-tools",
-    },
-  ] as Project[],
-
-  research: [
-    {
-      title: "AI Applications in Digital Health: A Comprehensive Survey",
-      journal: "Journal of Medical Internet Research",
-      year: "2023",
-      authors: ["Suresh Kumar Mukhiya", "Co-Author Name"],
-      link: "https://doi.org/example",
-    },
-    {
-      title: "Software Engineering Methodologies for Healthcare Technology",
-      journal: "IEEE Software",
-      year: "2022",
-      authors: ["Suresh Kumar Mukhiya", "Research Team"],
-      link: "https://doi.org/example",
-    },
-  ] as ResearchPaper[],
-
-  contact: {
-    email: "suresh@example.com",
-    linkedin: "https://linkedin.com/in/sureshmukhiya",
-    github: "https://github.com/sureshmukhiya",
-    website: "https://sureshmukhiya.com",
-  },
-};
+// Import dynamic data functions
+import {
+  getSkills,
+  getEducation,
+  getExperience,
+  getResearch,
+} from "./portfolio-chatbot-dynamic";
 
 // Function to get projects from GitHub (with fallback to static data)
 export async function getProjects(): Promise<Project[]> {
@@ -253,70 +108,90 @@ export async function getProjects(): Promise<Project[]> {
     console.error("Failed to fetch GitHub projects:", error);
   }
 
-  // Fallback to static projects if GitHub fails
-  return portfolioData.projects;
+  // Fallback to empty array if GitHub fails
+  return [];
 }
 
 // Function to get updated portfolio data with GitHub projects
 export async function getUpdatedPortfolioData() {
-  const projects = await getProjects();
+  const [skills, education, experience, projects, research] = await Promise.all([
+    getSkills(),
+    getEducation(),
+    getExperience(),
+    getProjects(),
+    getResearch(),
+  ]);
+
   return {
-    ...portfolioData,
+    skills,
+    education,
+    experience,
     projects,
+    research,
   };
 }
 
-// Predefined Q&A system
-export const predefinedQA = {
-  "What are Suresh's technical skills?": {
-    type: "skills",
-    data: portfolioData.skills,
-    textResponse:
-      "Here are my technical skills across different domains. I'm passionate about full-stack development with particular expertise in React, Node.js, and AI technologies.",
-  },
-  "Tell me about Suresh's educational background": {
-    type: "education",
-    data: portfolioData.education,
-    textResponse:
-      "I hold a PhD in Computer Science with specialization in Digital Health Solutions. My academic journey has been focused on bridging technology and healthcare.",
-  },
-  "What is Suresh's professional experience?": {
-    type: "experience",
-    data: portfolioData.experience,
-    textResponse:
-      "I have over 5 years of professional experience as a Senior Software Engineer, with a strong background in healthcare technology and full-stack development.",
-  },
-  "What projects has Suresh worked on?": {
-    type: "projects",
-    data: portfolioData.projects,
-    textResponse:
-      "I've worked on various exciting projects ranging from AI-powered healthcare solutions to open-source development tools. Each project showcases different aspects of my technical expertise.",
-  },
-  "What research has Suresh done?": {
-    type: "research",
-    data: portfolioData.research,
-    textResponse:
-      "My research focuses on AI applications in digital health and software engineering methodologies. I've published papers in peer-reviewed journals and conferences.",
-  },
-  "Tell me about Suresh's background": {
-    type: "overview",
-    data: {
-      summary:
-        "I'm a PhD holder specializing in software engineering, digital health, and AI applications. I combine academic research with practical industry experience to create innovative technology solutions.",
-      highlights: [
-        "🎓 PhD in Computer Science",
-        "💼 5+ years as Senior Software Engineer",
-        "🔬 Published researcher in digital health",
-        "🚀 Full-stack development expert",
-        "🤖 AI and machine learning enthusiast",
-      ],
+// Dynamic Q&A system that fetches data from database
+export const getPredefinedQA = async () => {
+  const [skills, education, experience, projects, research] = await Promise.all([
+    getSkills(),
+    getEducation(),
+    getExperience(),
+    getProjects(),
+    getResearch(),
+  ]);
+
+  return {
+    "What are Suresh's technical skills?": {
+      type: "skills",
+      data: skills,
+      textResponse:
+        "Here are my technical skills across different domains. I'm passionate about full-stack development with particular expertise in modern technologies.",
     },
-    textResponse:
-      "I'm a technology professional who bridges the gap between academic research and practical software development, with a special focus on healthcare technology and AI applications.",
-  },
+    "Tell me about Suresh's educational background": {
+      type: "education",
+      data: education,
+      textResponse:
+        "I hold a PhD in Computer Science with specialization in Digital Health Solutions. My academic journey has been focused on bridging technology and healthcare.",
+    },
+    "What is Suresh's professional experience?": {
+      type: "experience",
+      data: experience,
+      textResponse:
+        "I have professional experience as a software engineer, with a strong background in healthcare technology and full-stack development.",
+    },
+    "What projects has Suresh worked on?": {
+      type: "projects",
+      data: projects,
+      textResponse:
+        "I've worked on various exciting projects ranging from AI-powered healthcare solutions to open-source development tools. Each project showcases different aspects of my technical expertise.",
+    },
+    "What research has Suresh done?": {
+      type: "research",
+      data: research,
+      textResponse:
+        "My research focuses on AI applications in digital health and software engineering methodologies. I've published papers in peer-reviewed journals and conferences.",
+    },
+    "Tell me about Suresh's background": {
+      type: "overview",
+      data: {
+        summary:
+          "I'm a PhD holder specializing in software engineering, digital health, and AI applications. I combine academic research with practical industry experience to create innovative technology solutions.",
+        highlights: [
+          "🎓 PhD in Computer Science",
+          "💼 Professional Software Engineer",
+          "🔬 Published researcher in digital health",
+          "🚀 Full-stack development expert",
+          "🤖 AI and machine learning enthusiast",
+        ],
+      },
+      textResponse:
+        "I'm a technology professional who bridges the gap between academic research and practical software development, with a special focus on healthcare technology and AI applications.",
+    },
+  };
 };
 
-// Enhanced response generation with GitHub integration
+// Enhanced response generation with dynamic data
 export async function generateResponse(query: string): Promise<{
   type: "predefined" | "custom" | "email_request";
   response: string;
@@ -334,6 +209,9 @@ export async function generateResponse(query: string): Promise<{
   followUpQuestions?: string[];
   requiresEmail?: boolean;
 }> {
+  // Get dynamic predefined QA
+  const predefinedQA = await getPredefinedQA();
+  
   // Check for exact match with predefined questions
   const exactMatch = predefinedQA[query as keyof typeof predefinedQA];
   if (exactMatch) {
@@ -407,32 +285,33 @@ export async function generateResponse(query: string): Promise<{
     if (words.some((word) => queryLower.includes(word))) {
       const matchingQA = Object.entries(predefinedQA).find(
         ([, value]) =>
-          value.type === category ||
-          (category === "background" && value.type === "overview")
+          (value as QAData).type === category ||
+          (category === "background" && (value as QAData).type === "overview")
       );
 
       if (matchingQA) {
         const [, qaData] = matchingQA;
+        const typedQaData = qaData as QAData;
 
         // Special handling for projects to get GitHub data
-        if (qaData.type === "projects") {
+        if (typedQaData.type === "projects") {
           const projects = await getProjects();
           return {
             type: "predefined",
-            response: qaData.textResponse,
+            response: typedQaData.textResponse,
             data: {
-              ...qaData,
+              ...typedQaData,
               data: projects,
             },
-            followUpQuestions: getFollowUpQuestions(qaData.type),
+            followUpQuestions: getFollowUpQuestions(typedQaData.type),
           };
         }
 
         return {
           type: "predefined",
-          response: qaData.textResponse,
-          data: qaData,
-          followUpQuestions: getFollowUpQuestions(qaData.type),
+          response: typedQaData.textResponse,
+          data: typedQaData,
+          followUpQuestions: getFollowUpQuestions(typedQaData.type),
         };
       }
     }
@@ -481,4 +360,11 @@ export function getFollowUpQuestions(responseType: string): string[] {
 }
 
 // Updated suggested questions (initial ones)
-export const suggestedQuestions = Object.keys(predefinedQA);
+export const suggestedQuestions = [
+  "What are Suresh's technical skills?",
+  "Tell me about Suresh's educational background",
+  "What is Suresh's professional experience?",
+  "What projects has Suresh worked on?",
+  "What research has Suresh done?",
+  "Tell me about Suresh's background",
+];

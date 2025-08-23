@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
 import type { Skill } from "@/lib/supabase-auth";
+import { Input, Button } from "@/components/ui/form-components";
 
 interface SkillFormData {
   category_name: string;
@@ -33,9 +33,9 @@ export const SkillsManager: React.FC = () => {
   const fetchSkills = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/skills');
+      const response = await fetch("/api/admin/skills");
       const data = await response.json();
-      
+
       if (response.ok) {
         setSkills(data.skills || []);
       } else {
@@ -57,16 +57,19 @@ export const SkillsManager: React.FC = () => {
     try {
       if (editingSkill) {
         // Update existing skill
-        const response = await fetch(`/api/admin/skills?id=${editingSkill.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await fetch(
+          `/api/admin/skills?id=${editingSkill.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
 
         const data = await response.json();
-        
+
         if (response.ok) {
           setEditingSkill(null);
           fetchSkills();
@@ -75,16 +78,16 @@ export const SkillsManager: React.FC = () => {
         }
       } else {
         // Create new skill
-        const response = await fetch('/api/admin/skills', {
-          method: 'POST',
+        const response = await fetch("/api/admin/skills", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         });
 
         const data = await response.json();
-        
+
         if (response.ok) {
           setShowAddForm(false);
           fetchSkills();
@@ -123,11 +126,11 @@ export const SkillsManager: React.FC = () => {
 
     try {
       const response = await fetch(`/api/admin/skills?id=${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         fetchSkills();
       } else {

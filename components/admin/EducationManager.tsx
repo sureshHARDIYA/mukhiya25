@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Edit, Trash2, Save, X, GraduationCap, Calendar } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  GraduationCap,
+  Calendar,
+} from "lucide-react";
+import { Input, Textarea, Button } from "@/components/ui/form-components";
 
 interface Education {
   id?: string;
@@ -18,7 +26,6 @@ interface Education {
 }
 
 export const EducationManager: React.FC = () => {
-  const supabase = createClient();
   const [education, setEducation] = useState<Education[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<Education | null>(null);
@@ -37,18 +44,20 @@ export const EducationManager: React.FC = () => {
 
   const fetchEducation = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("education")
-      .select("*")
-      .order("sort_order", { ascending: true });
+    try {
+      const response = await fetch("/api/admin/education");
+      const data = await response.json();
 
-    if (error) {
+      if (response.ok) {
+        setEducation(data.education || []);
+      } else {
+        console.error("Error fetching education:", data.error);
+      }
+    } catch (error) {
       console.error("Error fetching education:", error);
-    } else {
-      setEducation(data || []);
     }
     setLoading(false);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchEducation();
@@ -60,21 +69,45 @@ export const EducationManager: React.FC = () => {
     try {
       if (editingItem) {
         // Update existing education
-        const { error } = await supabase
-          .from("education")
-          .update({
-            ...formData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", editingItem.id);
+        const response = await fetch(
+          `/api/admin/education?id=${editingItem.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
 
-        if (error) throw error;
-        setEditingItem(null);
+        const data = await response.json();
+
+        if (response.ok) {
+          setEditingItem(null);
+        } else {
+          console.error("Error updating education:", data.error);
+          alert("Error updating education. Please try again.");
+          return;
+        }
       } else {
         // Create new education
-        const { error } = await supabase.from("education").insert([formData]);
-        if (error) throw error;
-        setShowAddForm(false);
+        const response = await fetch("/api/admin/education", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setShowAddForm(false);
+        } else {
+          console.error("Error creating education:", data.error);
+          alert("Error creating education. Please try again.");
+          return;
+        }
       }
 
       await fetchEducation();
@@ -92,12 +125,22 @@ export const EducationManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this education entry?")) return;
+    if (!confirm("Are you sure you want to delete this education entry?"))
+      return;
 
     try {
-      const { error } = await supabase.from("education").delete().eq("id", id);
-      if (error) throw error;
-      await fetchEducation();
+      const response = await fetch(`/api/admin/education?id=${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await fetchEducation();
+      } else {
+        console.error("Error deleting education:", data.error);
+        alert("Error deleting education. Please try again.");
+      }
     } catch (error) {
       console.error("Error deleting education:", error);
       alert("Error deleting education. Please try again.");
@@ -121,7 +164,9 @@ export const EducationManager: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -158,7 +203,9 @@ export const EducationManager: React.FC = () => {
       {education.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <GraduationCap className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No education entries</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No education entries
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Get started by adding your educational background.
           </p>
@@ -166,13 +213,18 @@ export const EducationManager: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {education.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-6">
+            <div
+              key={item.id}
+              className="bg-white rounded-lg border border-gray-200 p-6"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h4 className="text-lg font-medium text-gray-900">
                     {item.degree} in {item.field_of_study}
                   </h4>
-                  <p className="text-indigo-600 font-medium">{item.institution}</p>
+                  <p className="text-indigo-600 font-medium">
+                    {item.institution}
+                  </p>
                   {item.location && (
                     <p className="text-sm text-gray-500">{item.location}</p>
                   )}
@@ -229,135 +281,104 @@ export const EducationManager: React.FC = () => {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Institution
-                  </label>
-                  <input
+                  <Input
+                    label="Institution"
                     type="text"
                     name="institution"
                     value={formData.institution}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="University or School Name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Degree
-                  </label>
-                  <input
+                  <Input
+                    label="Degree"
                     type="text"
                     name="degree"
                     value={formData.degree}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Bachelor's, Master's, PhD, etc."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Field of Study
-                  </label>
-                  <input
+                  <Input
+                    label="Field of Study"
                     type="text"
                     name="field_of_study"
                     value={formData.field_of_study}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Computer Science, Engineering, etc."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Start Date
-                  </label>
-                  <input
+                  <Input
+                    label="Start Date"
                     type="month"
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    End Date
-                  </label>
-                  <input
+                  <Input
+                    label="End Date"
                     type="month"
                     name="end_date"
                     value={formData.end_date}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Location
-                  </label>
-                  <input
+                  <Input
+                    label="Location"
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="City, Country"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Grade/GPA
-                  </label>
-                  <input
+                  <Input
+                    label="Grade/GPA"
                     type="text"
                     name="grade"
                     value={formData.grade}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="3.8/4.0, First Class, etc."
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <textarea
+                  <Textarea
+                    label="Description"
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     rows={3}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Notable achievements, coursework, projects, etc."
                   />
                 </div>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
+                <Button type="button" variant="outline" onClick={resetForm}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
+                </Button>
+                <Button type="submit" className="inline-flex items-center">
                   <Save className="h-4 w-4 mr-2" />
                   {editingItem ? "Update" : "Add"} Education
-                </button>
+                </Button>
               </div>
             </form>
           </div>

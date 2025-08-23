@@ -13,17 +13,17 @@ interface AdminLayoutClientProps {
 export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // Extract the active tab from the pathname
   const getActiveTab = () => {
-    if (!pathname) return 'dashboard';
-    const path = pathname.split('/admin/')[1];
-    return path || 'dashboard';
+    if (!pathname) return "dashboard";
+    const path = pathname.split("/admin/")[1];
+    return path || "dashboard";
   };
 
   const handleTabChange = (tab: string) => {
     // Navigate to the new route
-    const newPath = tab === 'dashboard' ? '/admin' : `/admin/${tab}`;
+    const newPath = tab === "dashboard" ? "/admin" : `/admin/${tab}`;
     router.push(newPath);
   };
 
