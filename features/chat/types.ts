@@ -3,6 +3,9 @@ export interface ChatMessage {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  type?: string;
+  data?: Record<string, unknown>;
+  followUpQuestions?: string[];
 }
 
 export interface ChatHistory {

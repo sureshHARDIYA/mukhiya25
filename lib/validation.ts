@@ -74,9 +74,11 @@ export function validateChatInput(input: string): ValidationResult {
     errors.push('Input contains potentially harmful content');
   }
   
-  // Check for SQL injection patterns
+  // Check for SQL injection patterns (more targeted)
   const sqlPatterns = [
-    /('|')|(\;)|(\-\-)|(\*)|(\bunion\b)|(\bselect\b)|(\binsert\b)|(\bupdate\b)|(\bdelete\b)|(\bdrop\b)|(\bcreate\b)|(\balter\b)|(\bexec\b)|(\bexecute\b)|(sp_)|(xp_)/i
+    /(\;.*\-\-)|(\bunion\s+select\b)|(\bselect\s+\*\s+from\b)|(\bdrop\s+table\b)|(\bdelete\s+from\b)|(\bupdate\s+\w+\s+set\b)|(\binsert\s+into\b)|(\bexec\s*\()|(\bexecute\s*\()/i,
+    /(\'\s*;\s*drop\b)|(\'\s*;\s*delete\b)|(\'\s*;\s*update\b)|(\'\s*union\b)|(\'\s*or\s+\w+\s*=)/i,
+    /(--\s*$)|(\/\*.*\*\/)/
   ];
   
   const hasSqlContent = sqlPatterns.some(pattern => pattern.test(input));

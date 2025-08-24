@@ -56,9 +56,14 @@ class GitHubService {
       );
 
       if (!response.ok) {
-        throw new Error(
+        if (response.status === 403) {
+          console.warn("GitHub API rate limit exceeded, using fallback data");
+          return [];
+        }
+        console.warn(
           `GitHub API error: ${response.status} ${response.statusText}`
         );
+        return [];
       }
 
       const repos: GitHubRepo[] = await response.json();
@@ -157,6 +162,11 @@ class GitHubService {
   ): Promise<ProcessedProject[]> {
     const allRepos = await this.fetchRepositories();
 
+    // If GitHub API failed (rate limit or other error), return fallback data
+    if (allRepos.length === 0) {
+      return this.getFallbackProjects();
+    }
+
     if (featuredRepoNames && featuredRepoNames.length > 0) {
       // Filter for specific featured repositories
       const featuredRepos = allRepos.filter((repo) =>
@@ -168,6 +178,58 @@ class GitHubService {
     // Return top repositories based on stars and activity
     const topRepos = allRepos.slice(0, 6);
     return this.processRepositories(topRepos);
+  }
+
+  /**
+   * Fallback projects when GitHub API is unavailable
+   */
+  private getFallbackProjects(): ProcessedProject[] {
+    return [
+      {
+        name: "mukhiya25",
+        description: "Personal portfolio website built with Next.js and TypeScript, featuring an AI-powered chatbot for interactive portfolio exploration.",
+        technologies: ["TypeScript", "Next.js", "React", "Tailwind CSS", "Supabase"],
+        link: "https://github.com/sureshHARDIYA/mukhiya25",
+        stars: 0,
+        forks: 0,
+        language: "TypeScript",
+        lastUpdated: "2025-01-24",
+        topics: ["portfolio", "nextjs", "chatbot", "ai"]
+      },
+      {
+        name: "idpt",
+        description: "Intelligent Digital Platform for healthcare research and data management, focusing on digital health solutions.",
+        technologies: ["Python", "Django", "PostgreSQL", "Docker"],
+        link: "https://github.com/sureshHARDIYA/idpt",
+        stars: 0,
+        forks: 0,
+        language: "Python",
+        lastUpdated: "2024-12-15",
+        topics: ["healthcare", "research", "data-management"]
+      },
+      {
+        name: "phd-resources",
+        description: "Comprehensive collection of resources, tools, and templates for PhD students in Computer Science and Digital Health.",
+        technologies: ["Markdown", "LaTeX", "Python", "R"],
+        link: "https://github.com/sureshHARDIYA/phd-resources",
+        stars: 0,
+        forks: 0,
+        language: "Python",
+        lastUpdated: "2024-11-20",
+        topics: ["phd", "research", "academia", "resources"]
+      },
+      {
+        name: "web-components",
+        description: "Modern, reusable web components library built with Web Standards and TypeScript for cross-framework compatibility.",
+        technologies: ["TypeScript", "Web Components", "CSS", "JavaScript"],
+        link: "https://github.com/sureshHARDIYA/web-components",
+        stars: 0,
+        forks: 0,
+        language: "TypeScript",
+        lastUpdated: "2024-10-30",
+        topics: ["web-components", "typescript", "frontend"]
+      }
+    ];
   }
 }
 

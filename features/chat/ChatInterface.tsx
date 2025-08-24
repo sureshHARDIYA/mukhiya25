@@ -61,7 +61,7 @@ export default function ChatInterface() {
     startNewChat();
   };
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
 
     const newMessage: ChatMessage = {
@@ -81,13 +81,30 @@ export default function ChatInterface() {
       setCurrentChatId(chatId);
     }
 
-    // Simulate bot response (we'll implement API later)
-    setTimeout(() => {
+    // Call the actual API
+    try {
+      const apiResponse = await fetch("/api/chat/respond", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: message }),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error(`API response not ok: ${apiResponse.status}`);
+      }
+
+      const response = await apiResponse.json();
+
       const botResponse: ChatMessage = {
         id: Date.now() + 1,
-        text: "Thanks for your question! I'll help you learn more about Suresh Kumar Mukhiya. This is a placeholder response - we'll implement the AI API soon.",
+        text: response.response,
         isUser: false,
         timestamp: new Date(),
+        type: response.type,
+        data: response.data,
+        followUpQuestions: response.followUpQuestions,
       };
 
       const finalMessages = [...updatedMessages, botResponse];
@@ -119,7 +136,20 @@ export default function ChatInterface() {
 
       ChatStorage.saveChatHistory(newHistory);
       setChatHistory(newHistory);
-    }, 1000);
+    } catch (error) {
+      console.error("Error calling API:", error);
+
+      // Fallback error response
+      const errorResponse: ChatMessage = {
+        id: Date.now() + 1,
+        text: "Sorry, I encountered an error processing your request. Please try again.",
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      const finalMessages = [...updatedMessages, errorResponse];
+      setMessages(finalMessages);
+    }
   };
 
   const handlePromptClick = (prompt: string) => {

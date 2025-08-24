@@ -85,9 +85,14 @@ export function validateFileUpload(file: File): { valid: boolean; error?: string
 
 // Request validation
 export function validateRequestOrigin(req: NextRequest): boolean {
+  // In development, be more permissive
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+  
   const origin = req.headers.get('origin');
   const referer = req.headers.get('referer');
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'];
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
   
   if (origin && !allowedOrigins.includes(origin)) {
     return false;

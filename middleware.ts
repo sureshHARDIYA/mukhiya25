@@ -24,8 +24,8 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
   }
 
-  // Validate request origin for state-changing requests
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+  // Validate request origin for state-changing requests (only in production)
+  if (process.env.NODE_ENV === 'production' && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
     if (!validateRequestOrigin(request)) {
       logSecurityEvent({
         type: 'SUSPICIOUS_ACTIVITY',

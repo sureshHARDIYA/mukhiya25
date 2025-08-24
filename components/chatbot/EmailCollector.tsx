@@ -143,7 +143,8 @@ export default function EmailCollector({
 
       <div className="mt-4 text-center">
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          💌 I typically respond within 24 hours • Your email won&apos;t be shared
+          💌 I typically respond within 24 hours • Your email won&apos;t be
+          shared
         </p>
       </div>
     </div>

@@ -379,7 +379,16 @@ export default function HomePage() {
                               <div className="markdown-content">
                                 <ReactMarkdown
                                   key={message.id} // Force re-render for each message
-                                  disallowedElements={['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'textarea']}
+                                  disallowedElements={[
+                                    "script",
+                                    "style",
+                                    "iframe",
+                                    "object",
+                                    "embed",
+                                    "form",
+                                    "input",
+                                    "textarea",
+                                  ]}
                                   unwrapDisallowed={true}
                                   components={{
                                     p: ({ children }) => (
@@ -389,16 +398,21 @@ export default function HomePage() {
                                     ),
                                     a: ({ href, children }) => {
                                       // Sanitize links to prevent javascript: and data: URLs
-                                      const isValidUrl = href && 
-                                        (href.startsWith('http://') || 
-                                         href.startsWith('https://') || 
-                                         href.startsWith('mailto:') ||
-                                         href.startsWith('/'));
-                                      
+                                      const isValidUrl =
+                                        href &&
+                                        (href.startsWith("http://") ||
+                                          href.startsWith("https://") ||
+                                          href.startsWith("mailto:") ||
+                                          href.startsWith("/"));
+
                                       if (!isValidUrl) {
-                                        return <span className="text-gray-600">{children}</span>;
+                                        return (
+                                          <span className="text-gray-600">
+                                            {children}
+                                          </span>
+                                        );
                                       }
-                                      
+
                                       return (
                                         <a
                                           href={href}

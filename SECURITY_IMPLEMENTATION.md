@@ -2,7 +2,21 @@
 
 ## ✅ Security Vulnerabilities FIXED
 
-This document summarizes the comprehensive security measures implemented to protect against SQL injection, XSS attacks, DOM attacks, and other common web vulnerabilities.
+This document summarizes the com### 🔧 Security Configuration
+
+### Development vs Production Security
+The security implementation automatically adjusts based on environment:
+
+**Development Mode (`NODE_ENV=development`)**:
+- CSP allows `'unsafe-eval'` and `'unsafe-inline'` for Next.js hot reloading
+- Origin validation is permissive to allow local development
+- All other security measures remain active
+
+**Production Mode (`NODE_ENV=production`)**:
+- Strict CSP without unsafe directives
+- Strict origin validation for CSRF protection
+- Full security headers including HSTS
+- Enhanced monitoring and loggingrehensive security measures implemented to protect against SQL injection, XSS attacks, DOM attacks, and other common web vulnerabilities.
 
 ## 🛡️ Security Measures Implemented
 
@@ -121,9 +135,25 @@ NODE_ENV=production
 ```
 
 ### Content Security Policy Applied:
+**Development:**
 ```
 default-src 'self'; 
-script-src 'self' 'nonce-development'; 
+script-src 'self' 'unsafe-eval' 'unsafe-inline'; 
+style-src 'self' 'unsafe-inline'; 
+img-src 'self' data: https:; 
+font-src 'self' data:; 
+connect-src 'self' https://*.supabase.co https://api.github.com; 
+frame-src 'none'; 
+object-src 'none'; 
+base-uri 'self'; 
+form-action 'self'; 
+frame-ancestors 'none';
+```
+
+**Production:**
+```
+default-src 'self'; 
+script-src 'self'; 
 style-src 'self' 'unsafe-inline'; 
 img-src 'self' data: https:; 
 font-src 'self' data:; 
