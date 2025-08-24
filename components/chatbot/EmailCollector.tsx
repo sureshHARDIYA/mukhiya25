@@ -58,7 +58,7 @@ export default function EmailCollector({
             Thank You!
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            I've received your question and will get back to you at{" "}
+            I&apos;ve received your question and will get back to you at{" "}
             <strong>{email}</strong> within 24 hours.
           </p>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-left">
@@ -66,7 +66,7 @@ export default function EmailCollector({
               Your question:
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-              "{question}"
+              &quot;{question}&quot;
             </p>
           </div>
         </div>
@@ -79,10 +79,10 @@ export default function EmailCollector({
       <div className="text-center mb-6">
         <Mail className="w-8 h-8 text-blue-500 mx-auto mb-3" />
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          Let's Connect!
+          Let&apos;s Connect!
         </h3>
         <p className="text-gray-600 dark:text-gray-300">
-          I'd love to give you a personalized answer to your question.
+          I&apos;d love to give you a personalized answer to your question.
         </p>
       </div>
 
@@ -91,7 +91,7 @@ export default function EmailCollector({
           Your question:
         </p>
         <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-          "{question}"
+          &quot;{question}&quot;
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function EmailCollector({
 
       <div className="mt-4 text-center">
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          💌 I typically respond within 24 hours • Your email won't be shared
+          💌 I typically respond within 24 hours • Your email won&apos;t be shared
         </p>
       </div>
     </div>

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
 import type { Skill } from "@/lib/supabase-auth";
-import { Input, Button } from "@/components/ui/form-components";
 
 interface SkillFormData {
   category_name: string;

@@ -15,6 +15,7 @@ import RichResponse from "@/components/chatbot/RichResponse";
 import EmailCollector from "@/components/chatbot/EmailCollector";
 import FollowUpQuestionsAdmin from "@/components/chatbot/FollowUpQuestionsAdmin";
 import TypingIndicator from "@/components/chatbot/TypingIndicator";
+import ReactMarkdown from "react-markdown";
 
 interface ChatMessage {
   id: number;
@@ -375,9 +376,50 @@ export default function HomePage() {
                           <div>
                             {/* Text response */}
                             <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl px-4 py-3 mb-2">
-                              <p className="whitespace-pre-wrap">
-                                {message.text}
-                              </p>
+                              <div className="markdown-content">
+                                <ReactMarkdown
+                                  key={message.id} // Force re-render for each message
+                                  components={{
+                                    p: ({ children }) => (
+                                      <p className="whitespace-pre-wrap mb-2 last:mb-0">
+                                        {children}
+                                      </p>
+                                    ),
+                                    a: ({ href, children }) => (
+                                      <a
+                                        href={href}
+                                        className="text-blue-600 hover:text-blue-800 underline"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {children}
+                                      </a>
+                                    ),
+                                    strong: ({ children }) => (
+                                      <strong className="font-semibold">
+                                        {children}
+                                      </strong>
+                                    ),
+                                    em: ({ children }) => (
+                                      <em className="italic">{children}</em>
+                                    ),
+                                    code: ({ children }) => (
+                                      <code className="bg-gray-200 dark:bg-gray-600 text-red-600 dark:text-red-400 px-1 py-0.5 rounded text-sm font-mono">
+                                        {children}
+                                      </code>
+                                    ),
+                                  }}
+                                >
+                                  {message.text}
+                                </ReactMarkdown>
+                              </div>
+                              {/* Debug info - remove in production */}
+                              {process.env.NODE_ENV === "development" && (
+                                <div className="text-xs text-gray-500 mt-2 border-t pt-1">
+                                  Type: {message.type || "undefined"} | Text
+                                  length: {message.text?.length || 0}
+                                </div>
+                              )}
                               <p className="text-xs opacity-70 mt-2">
                                 {message.timestamp.toLocaleTimeString([], {
                                   hour: "2-digit",
@@ -386,10 +428,12 @@ export default function HomePage() {
                               </p>
                             </div>
 
-                            {/* Rich response component */}
-                            {message.type === "predefined" && message.data && (
-                              <RichResponse responseData={message.data} />
-                            )}
+                            {/* Rich response component - only for responses with structured data */}
+                            {message.type === "predefined" &&
+                              message.data &&
+                              message.data.type !== "text" && (
+                                <RichResponse responseData={message.data} />
+                              )}
 
                             {/* Follow-up questions */}
                             {message.followUpQuestions &&

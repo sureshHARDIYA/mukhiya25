@@ -1,46 +1,6 @@
 // scripts/setup-database.ts
 import { supabaseAdmin } from "@/lib/supabase";
 
-// SQL to create the database schema
-const createTablesSQL = `
--- Create intents table
-CREATE TABLE IF NOT EXISTS intents (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50) UNIQUE NOT NULL,
-  description TEXT,
-  confidence_threshold DECIMAL(3,2) DEFAULT 0.7,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create responses table
-CREATE TABLE IF NOT EXISTS responses (
-  id SERIAL PRIMARY KEY,
-  intent_id INTEGER REFERENCES intents(id) ON DELETE CASCADE,
-  trigger_patterns TEXT[] DEFAULT '{}',
-  response_text TEXT NOT NULL,
-  response_type VARCHAR(20) NOT NULL,
-  response_data JSONB,
-  follow_up_questions TEXT[] DEFAULT '{}',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create user_queries table for analytics
-CREATE TABLE IF NOT EXISTS user_queries (
-  id SERIAL PRIMARY KEY,
-  query TEXT NOT NULL,
-  detected_intent VARCHAR(50),
-  confidence DECIMAL(3,2),
-  response_id INTEGER REFERENCES responses(id),
-  user_feedback INTEGER CHECK (user_feedback >= 1 AND user_feedback <= 5),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_responses_intent_id ON responses(intent_id);
-CREATE INDEX IF NOT EXISTS idx_user_queries_created_at ON user_queries(created_at);
-CREATE INDEX IF NOT EXISTS idx_user_queries_intent ON user_queries(detected_intent);
-`;
-
 // Initial data to populate the database
 const initialIntents = [
   {
@@ -322,6 +282,39 @@ export async function setupDatabase() {
     }
     
     console.log('✅ Tables should exist now. Continuing with data insertion...')
+    
+    // Insert sample intents
+    console.log('Inserting sample intents...')
+    for (const intent of initialIntents) {
+      const { error } = await supabaseAdmin
+        .from('intents')
+        .upsert(intent, { onConflict: 'name' })
+      
+      if (error) {
+        console.error(`Error inserting intent ${intent.name}:`, error)
+      }
+    }
+    
+    // Insert sample responses
+    console.log('Inserting sample responses...')
+    for (const response of initialResponses) {
+      const { error } = await supabaseAdmin
+        .from('responses')
+        .upsert(response, { onConflict: 'id' })
+      
+      if (error) {
+        console.error(`Error inserting response for ${response.intent_name}:`, error)
+      }
+    }
+    
+    console.log('✅ Database setup completed successfully!')
+    return true
+    
+  } catch (error) {
+    console.error('❌ Database setup failed:', error)
+    return false
+  }
+}
 
 // Run this if called directly
 if (require.main === module) {

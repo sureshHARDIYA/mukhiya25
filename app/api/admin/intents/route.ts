@@ -1,34 +1,9 @@
 // app/api/admin/intents/route.ts
-import { supabaseAdmin } from '@/lib/supabase';
-import { validateAdminAccess, validateAdminIP, rateLimit } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Middleware-like function to handle auth and rate limiting
-function withAdminAuth(handler: (req: NextRequest) => Promise<NextResponse>) {
-  return async (req: NextRequest) => {
-    // IP validation
-    const ipError = validateAdminIP(req);
-    if (ipError) return ipError;
-
-    // API key validation
-    const authError = validateAdminAccess(req);
-    if (authError) return authError;
-
-    // Rate limiting
-    const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
-    if (!rateLimit(`admin:${clientIP}`, 20, 60000)) { // 20 requests per minute
-      return NextResponse.json(
-        { error: 'Rate limit exceeded' },
-        { status: 429 }
-      );
-    }
-
-    return handler(req);
-  };
-}
+import { supabaseAdmin } from '@/lib/supabase';
 
 // GET - List all intents
-export const GET = withAdminAuth(async () => {
+export async function GET() {
   try {
     const { data: intents, error } = await supabaseAdmin
       .from('intents')
@@ -45,10 +20,10 @@ export const GET = withAdminAuth(async () => {
       { status: 500 }
     );
   }
-});
+}
 
 // POST - Create new intent
-export const POST = withAdminAuth(async (req: NextRequest) => {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { name, description, confidence_threshold } = body;
@@ -81,13 +56,15 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
       { status: 500 }
     );
   }
-});
+}
 
 // PUT - Update existing intent
-export const PUT = withAdminAuth(async (req: NextRequest) => {
+export async function PUT(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     const body = await req.json();
-    const { id, name, description, confidence_threshold } = body;
+    const { name, description, confidence_threshold } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -117,10 +94,10 @@ export const PUT = withAdminAuth(async (req: NextRequest) => {
       { status: 500 }
     );
   }
-});
+}
 
 // DELETE - Remove intent
-export const DELETE = withAdminAuth(async (req: NextRequest) => {
+export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -147,4 +124,4 @@ export const DELETE = withAdminAuth(async (req: NextRequest) => {
       { status: 500 }
     );
   }
-});
+}

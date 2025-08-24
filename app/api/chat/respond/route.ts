@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   analyzeIntent,
   getIntentSuggestions,
-  type IntentResult,
 } from "@/lib/intent-detector";
-import { supabase, type Response } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { getProjects } from "@/lib/portfolio-chatbot";
 import { 
   getSkills, 
@@ -13,7 +12,7 @@ import {
   getExperience, 
   getResearch 
 } from "@/lib/portfolio-chatbot-dynamic";
-import { validateChatInput, sanitizeForDatabase } from "@/lib/validation";
+import { validateChatInput } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +40,7 @@ export async function POST(request: NextRequest) {
     const intentResult = analyzeIntent(sanitizedQuery);
     console.log("Intent analysis:", intentResult);
 
-    // 2. Get response from database based on intent
+    // 2. Get ALL responses from database for trigger pattern matching
     const { data: responses, error } = await supabase
       .from("responses")
       .select(
@@ -52,8 +51,7 @@ export async function POST(request: NextRequest) {
           confidence_threshold
         )
       `
-      )
-      .eq("intents.name", intentResult.intent);
+      );
 
     if (error) {
       console.error("Database error:", error);
@@ -61,20 +59,50 @@ export async function POST(request: NextRequest) {
       return await fallbackToLegacySystem(query);
     }
 
-    // 3. Find best matching response
+    // 3. Find best matching response using trigger patterns
     let bestResponse = null;
+    let highestPatternScore = 0;
+    
     if (responses && responses.length > 0) {
-      // For now, just take the first response
-      // Later we can implement pattern matching against trigger_patterns
-      bestResponse = responses[0];
+      const queryLower = sanitizedQuery.toLowerCase();
+      
+      for (const response of responses) {
+        let patternScore = 0;
+        
+        // Check if any trigger patterns match the query
+        if (response.trigger_patterns && response.trigger_patterns.length > 0) {
+          for (const pattern of response.trigger_patterns) {
+            if (pattern && queryLower.includes(pattern.toLowerCase())) {
+              patternScore += 1;
+            }
+          }
+        }
+        
+        // If this response has better pattern matching, use it
+        if (patternScore > highestPatternScore || (!bestResponse && patternScore >= 0)) {
+          bestResponse = response;
+          highestPatternScore = patternScore;
+        }
+      }
+      
+      // If no pattern matches, use first response as fallback
+      if (!bestResponse && responses.length > 0) {
+        bestResponse = responses[0];
+      }
     }
 
-    // 4. If no response found or confidence too low, use fallback
+    // 4. If we have a high pattern score, override confidence
+    let finalConfidence = intentResult.confidence;
+    if (highestPatternScore > 0) {
+      finalConfidence = Math.max(finalConfidence, 0.8); // Boost confidence for pattern matches
+    }
+
+    // 5. If no response found or confidence too low, use fallback
     const confidenceThreshold =
       bestResponse?.intents?.confidence_threshold || 0.6;
-    if (!bestResponse || intentResult.confidence < confidenceThreshold) {
+    if (!bestResponse || finalConfidence < confidenceThreshold) {
       console.log(
-        `Low confidence (${intentResult.confidence}) or no response found, using fallback`
+        `Low confidence (${finalConfidence}) or no response found, using fallback`
       );
       return await fallbackToLegacySystem(query);
     }
@@ -93,7 +121,7 @@ export async function POST(request: NextRequest) {
       response: enhancedResponse.response_text,
       data: enhancedResponse.response_data,
       followUpQuestions: followUps,
-      confidence: intentResult.confidence,
+      confidence: finalConfidence,
       detectedIntent: intentResult.intent,
       requiresEmail: false,
     });
