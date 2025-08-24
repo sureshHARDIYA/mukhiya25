@@ -13,9 +13,22 @@ import {
   getResearch 
 } from "@/lib/portfolio-chatbot-dynamic";
 import { validateChatInput } from "@/lib/validation";
+import { rateLimit } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting for chat API
+    const clientIP = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    if (!rateLimit(clientIP, 30, 60000)) { // 30 requests per minute
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please wait before sending another message." },
+        { status: 429 }
+      );
+    }
+
     const { query } = await request.json();
 
     if (!query || typeof query !== "string") {

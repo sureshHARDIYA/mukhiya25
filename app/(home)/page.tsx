@@ -379,22 +379,37 @@ export default function HomePage() {
                               <div className="markdown-content">
                                 <ReactMarkdown
                                   key={message.id} // Force re-render for each message
+                                  disallowedElements={['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'textarea']}
+                                  unwrapDisallowed={true}
                                   components={{
                                     p: ({ children }) => (
                                       <p className="whitespace-pre-wrap mb-2 last:mb-0">
                                         {children}
                                       </p>
                                     ),
-                                    a: ({ href, children }) => (
-                                      <a
-                                        href={href}
-                                        className="text-blue-600 hover:text-blue-800 underline"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                      >
-                                        {children}
-                                      </a>
-                                    ),
+                                    a: ({ href, children }) => {
+                                      // Sanitize links to prevent javascript: and data: URLs
+                                      const isValidUrl = href && 
+                                        (href.startsWith('http://') || 
+                                         href.startsWith('https://') || 
+                                         href.startsWith('mailto:') ||
+                                         href.startsWith('/'));
+                                      
+                                      if (!isValidUrl) {
+                                        return <span className="text-gray-600">{children}</span>;
+                                      }
+                                      
+                                      return (
+                                        <a
+                                          href={href}
+                                          className="text-blue-600 hover:text-blue-800 underline"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          {children}
+                                        </a>
+                                      );
+                                    },
                                     strong: ({ children }) => (
                                       <strong className="font-semibold">
                                         {children}

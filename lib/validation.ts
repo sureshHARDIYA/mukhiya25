@@ -13,6 +13,9 @@ function basicSanitize(input: string): string {
     .replace(/<[^>]*>/g, '') // Remove all HTML tags
     .replace(/javascript:/gi, '') // Remove javascript: URLs
     .replace(/on\w+\s*=/gi, '') // Remove event handlers
+    .replace(/data:/gi, '') // Remove data URLs that could contain encoded scripts
+    .replace(/vbscript:/gi, '') // Remove vbscript URLs
+    .replace(/expression\s*\(/gi, '') // Remove CSS expressions
     .trim();
 }
 
@@ -34,9 +37,33 @@ export function validateChatInput(input: string): ValidationResult {
     /javascript:/i,
     /onload=/i,
     /onerror=/i,
+    /onclick=/i,
+    /onmouseover=/i,
+    /onfocus=/i,
     /eval\(/i,
     /document\./i,
-    /window\./i
+    /window\./i,
+    /alert\(/i,
+    /confirm\(/i,
+    /prompt\(/i,
+    /execCommand/i,
+    /innerHTML/i,
+    /outerHTML/i,
+    /insertAdjacentHTML/i,
+    /document\.write/i,
+    /document\.writeln/i,
+    /style\s*=.*expression/i,
+    /style\s*=.*javascript/i,
+    /vbscript:/i,
+    /data:text\/html/i,
+    /data:image\/svg\+xml/i,
+    /<iframe/i,
+    /<object/i,
+    /<embed/i,
+    /<applet/i,
+    /<form/i,
+    /<input/i,
+    /<textarea/i
   ];
   
   const hasSuspiciousContent = suspiciousPatterns.some(pattern => 
@@ -45,6 +72,16 @@ export function validateChatInput(input: string): ValidationResult {
   
   if (hasSuspiciousContent) {
     errors.push('Input contains potentially harmful content');
+  }
+  
+  // Check for SQL injection patterns
+  const sqlPatterns = [
+    /('|')|(\;)|(\-\-)|(\*)|(\bunion\b)|(\bselect\b)|(\binsert\b)|(\bupdate\b)|(\bdelete\b)|(\bdrop\b)|(\bcreate\b)|(\balter\b)|(\bexec\b)|(\bexecute\b)|(sp_)|(xp_)/i
+  ];
+  
+  const hasSqlContent = sqlPatterns.some(pattern => pattern.test(input));
+  if (hasSqlContent) {
+    errors.push('Input contains potentially harmful SQL patterns');
   }
   
   // Sanitize content

@@ -1,9 +1,14 @@
 // app/api/admin/responses/route.ts
 import { supabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateAdminAccess } from '@/lib/auth';
 
 // GET - List all responses with intent information
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check admin authentication
+  const authError = validateAdminAccess(request);
+  if (authError) return authError;
+
   try {
     const { data: responses, error } = await supabaseAdmin
       .from('responses')
@@ -31,6 +36,10 @@ export async function GET() {
 
 // POST - Create new response
 export async function POST(req: NextRequest) {
+  // Check admin authentication
+  const authError = validateAdminAccess(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { 
