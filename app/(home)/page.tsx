@@ -141,6 +141,12 @@ export default function HomePage() {
         requiresEmail: response.requiresEmail,
       };
 
+      console.log('🔍 Debug - Adding bot response:', {
+        id: botResponse.id,
+        text: botResponse.text.substring(0, 50) + '...',
+        messagesLengthBefore: updatedMessages.length
+      });
+
       const finalMessages = [...updatedMessages, botResponse];
       setMessages(finalMessages);
 
@@ -344,7 +350,9 @@ export default function HomePage() {
               {/* Messages Container */}
               {messages.length > 0 && (
                 <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-6">
-                  {messages.map((message) => (
+                  {messages.map((message) => {
+                    console.log('🔍 Rendering message:', { id: message.id, isUser: message.isUser, text: message.text.substring(0, 50) });
+                    return (
                     <div
                       key={message.id}
                       className={`flex gap-4 ${
@@ -524,7 +532,8 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
 
                   {/* Typing indicator */}
                   {isTyping && (

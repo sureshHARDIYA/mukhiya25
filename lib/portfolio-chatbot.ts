@@ -54,7 +54,7 @@ export interface ResearchPaper {
 
 export interface QAData {
   type: string;
-  data: SkillCategory[] | Education[] | Experience[] | Project[] | ResearchPaper[] | { summary: string; highlights: string[] };
+  data: SkillCategory[] | Education[] | Experience[] | Project[] | ResearchPaper[] | { summary: string; highlights: string[] } | { privacy_message: string; redirect_suggestions: string[] };
   textResponse: string;
 }
 
@@ -188,6 +188,20 @@ export const getPredefinedQA = async () => {
       textResponse:
         "I'm a technology professional who bridges the gap between academic research and practical software development, with a special focus on healthcare technology and AI applications.",
     },
+    "Are you married?": {
+      type: "personal",
+      data: {
+        privacy_message: "I prefer to keep my personal life private and focus on professional discussions.",
+        redirect_suggestions: [
+          "Let's talk about my technical skills instead",
+          "Would you like to know about my projects?",
+          "I'd be happy to discuss my research work",
+          "Feel free to ask about my professional experience"
+        ]
+      },
+      textResponse:
+        "I appreciate your interest, but I prefer to keep my personal life private. I'm here to discuss my professional background, skills, and projects. What would you like to know about my work?",
+    },
   };
 };
 
@@ -203,7 +217,8 @@ export async function generateResponse(query: string): Promise<{
       | Experience[]
       | Project[]
       | ResearchPaper[]
-      | { summary: string; highlights: string[] };
+      | { summary: string; highlights: string[] }
+      | { privacy_message: string; redirect_suggestions: string[] };
     textResponse: string;
   };
   followUpQuestions?: string[];

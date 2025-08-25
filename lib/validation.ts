@@ -1,9 +1,13 @@
 // lib/validation.ts - Input validation and sanitization
+import { detectProfanity, logProfanityAttempt } from './profanity-filter';
 
 export interface ValidationResult {
   isValid: boolean;
   sanitized?: string;
   errors: string[];
+  isProfane?: boolean;
+  moralResponse?: string;
+  severity?: 'low' | 'medium' | 'high';
 }
 
 // Basic HTML sanitization without external dependencies
@@ -20,7 +24,7 @@ function basicSanitize(input: string): string {
 }
 
 // Chat input validation
-export function validateChatInput(input: string): ValidationResult {
+export function validateChatInput(input: string, clientIP?: string): ValidationResult {
   const errors: string[] = [];
   
   if (!input || input.trim().length === 0) {
@@ -29,6 +33,21 @@ export function validateChatInput(input: string): ValidationResult {
   
   if (input.length > 1000) {
     errors.push('Input too long (max 1000 characters)');
+  }
+
+  // Check for profanity FIRST (highest priority)
+  const profanityResult = detectProfanity(input);
+  if (profanityResult.isProfane) {
+    // Log the profanity attempt
+    logProfanityAttempt(input, profanityResult.detectedWords, profanityResult.severity, clientIP);
+    
+    return {
+      isValid: false,
+      errors: ['Content contains inappropriate language'],
+      isProfane: true,
+      moralResponse: profanityResult.fullResponse,
+      severity: profanityResult.severity
+    };
   }
   
   // Check for potential injection attempts

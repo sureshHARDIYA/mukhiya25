@@ -39,8 +39,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate and sanitize input
-    const validation = validateChatInput(query);
+    const validation = validateChatInput(query, clientIP);
     if (!validation.isValid) {
+      // Special handling for profanity
+      if (validation.isProfane && validation.moralResponse) {
+        return NextResponse.json({
+          type: "moral_guidance",
+          response: validation.moralResponse,
+          severity: validation.severity,
+          confidence: 1.0,
+          detectedIntent: "INAPPROPRIATE_CONTENT",
+          requiresEmail: false
+        });
+      }
+      
+      // Handle other validation errors
       return NextResponse.json(
         { error: "Invalid input", details: validation.errors },
         { status: 400 }
