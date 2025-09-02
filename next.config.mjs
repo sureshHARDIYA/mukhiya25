@@ -5,7 +5,7 @@ const withMDX = createMDX();
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
-  
+
   // Webpack configuration for esbuild issues
   webpack: (config, { isServer }) => {
     if (!isServer) {
