@@ -92,17 +92,38 @@ export function validateRequestOrigin(req: NextRequest): boolean {
   
   const origin = req.headers.get('origin');
   const referer = req.headers.get('referer');
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
   
-  if (origin && !allowedOrigins.includes(origin)) {
-    return false;
+  // Default allowed origins
+  const defaultOrigins = [
+    'http://localhost:3000', 
+    'http://localhost:3001', 
+    'http://localhost:3002',
+    'https://mukhiyaji.netlify.app'
+  ];
+  
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || defaultOrigins;
+  
+  // Also allow any Netlify deploy previews
+  const isNetlifyDomain = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.endsWith('.netlify.app');
+    } catch {
+      return false;
+    }
+  };
+  
+  if (origin) {
+    if (!allowedOrigins.includes(origin) && !isNetlifyDomain(origin)) {
+      return false;
+    }
   }
   
   if (referer) {
     try {
       const refererUrl = new URL(referer);
       const refererOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
-      if (!allowedOrigins.includes(refererOrigin)) {
+      if (!allowedOrigins.includes(refererOrigin) && !isNetlifyDomain(refererOrigin)) {
         return false;
       }
     } catch {
