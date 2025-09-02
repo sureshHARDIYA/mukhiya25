@@ -1,4 +1,6 @@
 // lib/portfolio-chatbot-dynamic.ts - Dynamic portfolio data fetcher
+import { supabase } from './supabase-auth';
+
 export interface SkillCategory {
   name: string;
   skills: Array<{
@@ -64,27 +66,123 @@ const isCacheValid = () => {
          (Date.now() - portfolioCache.lastUpdated) < CACHE_DURATION;
 };
 
-// Fetch data from API with caching
-async function fetchPortfolioData<T>(endpoint: string, key: keyof typeof portfolioCache): Promise<T[]> {
+// Fetch data from Supabase directly (server-side)
+async function fetchPortfolioData<T>(tableName: string, key: keyof typeof portfolioCache): Promise<T[]> {
   if (isCacheValid() && portfolioCache[key]) {
     return portfolioCache[key] as T[];
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/portfolio/${endpoint}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let data: any[] = [];
+    
+    if (tableName === 'education') {
+      const { data: educationData, error } = await supabase
+        .from('education')
+        .select('*')
+        .order('end_year', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Format education data
+      data = educationData?.map(edu => ({
+        degree: edu.degree,
+        institution: edu.institution,
+        year: edu.end_year ? edu.end_year.toString() : 'Present',
+        description: edu.description || '',
+        status: edu.status as 'completed' | 'current',
+      })) || [];
+      
+    } else if (tableName === 'skills') {
+      const { data: skillsData, error } = await supabase
+        .from('skills')
+        .select('*')
+        .order('category');
+      
+      if (error) throw error;
+      
+      // Group skills by category
+      const skillCategories: { [key: string]: Array<{ name: string; level: number; color: string }> } = {};
+      skillsData?.forEach(skill => {
+        if (!skillCategories[skill.category]) {
+          skillCategories[skill.category] = [];
+        }
+        skillCategories[skill.category].push({
+          name: skill.skill_name,
+          level: skill.proficiency_level,
+          color: skill.color || '#3B82F6'
+        });
+      });
+      
+      data = Object.entries(skillCategories).map(([name, skills]) => ({
+        name,
+        skills
+      }));
+      
+    } else if (tableName === 'experience') {
+      const { data: experienceData, error } = await supabase
+        .from('experience')
+        .select('*')
+        .order('start_date', { ascending: false });
+      
+      if (error) throw error;
+      
+      data = experienceData?.map(exp => ({
+        title: exp.job_title,
+        company: exp.company_name,
+        duration: `${exp.start_date} - ${exp.end_date || 'Present'}`,
+        description: exp.responsibilities || [],
+        technologies: exp.technologies || [],
+      })) || [];
+      
+    } else if (tableName === 'projects') {
+      const { data: projectsData, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      data = projectsData?.map(project => ({
+        title: project.title,
+        description: project.description,
+        technologies: project.technologies || [],
+        github: project.github_url,
+        live: project.live_url,
+        featured: project.featured || false,
+        stars: project.github_stars || 0,
+        forks: project.github_forks || 0,
+        language: project.primary_language || 'JavaScript',
+      })) || [];
+      
+    } else if (tableName === 'research') {
+      const { data: researchData, error } = await supabase
+        .from('research')
+        .select('*')
+        .order('publication_year', { ascending: false });
+      
+      if (error) throw error;
+      
+      data = researchData?.map(paper => ({
+        title: paper.title,
+        authors: paper.authors || [],
+        journal: paper.journal,
+        year: paper.publication_year?.toString() || '',
+        abstract: paper.abstract || '',
+        doi: paper.doi,
+        url: paper.url,
+      })) || [];
     }
     
-    const data = await response.json();
-    portfolioCache[key] = data[endpoint] || data[key] || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (portfolioCache as any)[key] = data;
     portfolioCache.lastUpdated = Date.now();
     
-    return portfolioCache[key] as T[];
+    return data as T[];
   } catch (error) {
-    console.error(`Error fetching ${endpoint}:`, error);
+    console.error(`Error fetching ${tableName}:`, error);
     // Return cached data if available, otherwise empty array
-    return portfolioCache[key] as T[] || [];
+    return (portfolioCache[key] as T[]) || [];
   }
 }
 
