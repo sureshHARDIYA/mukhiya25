@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev --turbo",
     "start": "next start",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "node scripts/install-esbuild.cjs && fumadocs-mdx",
+    "netlify-build": "npm install @esbuild/linux-x64 --no-save && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -35,10 +36,20 @@
     "@types/node": "24.1.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "esbuild": "^0.24.2",
     "eslint": "^8",
     "eslint-config-next": "15.4.5",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2"
+  },
+  "optionalDependencies": {
+    "@esbuild/darwin-arm64": "^0.24.2",
+    "@esbuild/darwin-x64": "^0.24.2",
+    "@esbuild/linux-arm64": "^0.24.2",
+    "@esbuild/linux-x64": "^0.24.2",
+    "@esbuild/win32-arm64": "^0.24.2",
+    "@esbuild/win32-ia32": "^0.24.2",
+    "@esbuild/win32-x64": "^0.24.2"
   }
 }
