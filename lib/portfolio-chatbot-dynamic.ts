@@ -97,19 +97,21 @@ async function fetchPortfolioData<T>(tableName: string, key: keyof typeof portfo
       const { data: skillsData, error } = await supabase
         .from('skills')
         .select('*')
-        .order('category');
+        .eq('is_active', true)
+        .order('category_name')
+        .order('sort_order');
       
       if (error) throw error;
       
       // Group skills by category
       const skillCategories: { [key: string]: Array<{ name: string; level: number; color: string }> } = {};
       skillsData?.forEach(skill => {
-        if (!skillCategories[skill.category]) {
-          skillCategories[skill.category] = [];
+        if (!skillCategories[skill.category_name]) {
+          skillCategories[skill.category_name] = [];
         }
-        skillCategories[skill.category].push({
+        skillCategories[skill.category_name].push({
           name: skill.skill_name,
-          level: skill.proficiency_level,
+          level: skill.skill_level,
           color: skill.color || '#3B82F6'
         });
       });
@@ -157,17 +159,17 @@ async function fetchPortfolioData<T>(tableName: string, key: keyof typeof portfo
       
     } else if (tableName === 'research') {
       const { data: researchData, error } = await supabase
-        .from('research')
+        .from('research_papers')
         .select('*')
-        .order('publication_year', { ascending: false });
+        .order('publication_date', { ascending: false });
       
       if (error) throw error;
       
       data = researchData?.map(paper => ({
         title: paper.title,
         authors: paper.authors || [],
-        journal: paper.journal,
-        year: paper.publication_year?.toString() || '',
+        journal: paper.publication || '',
+        year: paper.publication_date ? new Date(paper.publication_date).getFullYear().toString() : '',
         abstract: paper.abstract || '',
         doi: paper.doi,
         url: paper.url,
