@@ -76,7 +76,6 @@ export interface Education {
   end_year: number | null
   description: string | null
   status: 'completed' | 'current' | 'pending'
-  grade: string | null
   location: string | null
   is_featured: boolean
   sort_order: number

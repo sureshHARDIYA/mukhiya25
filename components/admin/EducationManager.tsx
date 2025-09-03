@@ -20,7 +20,6 @@ interface Education {
   start_date: string;
   end_date: string;
   description: string;
-  grade?: string;
   location?: string;
   sort_order: number;
 }
@@ -37,7 +36,6 @@ export const EducationManager: React.FC = () => {
     start_date: "",
     end_date: "",
     description: "",
-    grade: "",
     location: "",
     sort_order: 0,
   });
@@ -155,7 +153,6 @@ export const EducationManager: React.FC = () => {
       start_date: "",
       end_date: "",
       description: "",
-      grade: "",
       location: "",
       sort_order: education.length,
     });
@@ -231,11 +228,6 @@ export const EducationManager: React.FC = () => {
                   <div className="flex items-center mt-2 text-sm text-gray-500">
                     <Calendar className="h-4 w-4 mr-1" />
                     {item.start_date} - {item.end_date || "Present"}
-                    {item.grade && (
-                      <span className="ml-4 bg-gray-100 px-2 py-1 rounded text-xs">
-                        Grade: {item.grade}
-                      </span>
-                    )}
                   </div>
                   {item.description && (
                     <p className="mt-3 text-gray-700">{item.description}</p>
@@ -345,17 +337,6 @@ export const EducationManager: React.FC = () => {
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="City, Country"
-                  />
-                </div>
-
-                <div>
-                  <Input
-                    label="Grade/GPA"
-                    type="text"
-                    name="grade"
-                    value={formData.grade}
-                    onChange={handleChange}
-                    placeholder="3.8/4.0, First Class, etc."
                   />
                 </div>
 
