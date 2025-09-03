@@ -141,12 +141,6 @@ export default function HomePage() {
         requiresEmail: response.requiresEmail,
       };
 
-      console.log("🔍 Debug - Adding bot response:", {
-        id: botResponse.id,
-        text: botResponse.text.substring(0, 50) + "...",
-        messagesLengthBefore: updatedMessages.length,
-      });
-
       const finalMessages = [...updatedMessages, botResponse];
       setMessages(finalMessages);
 
@@ -204,7 +198,6 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen max-h-screen bg-white dark:bg-gray-900">
-      {/* Sidebar - only show if there's chat history or explicitly opened */}
       {shouldShowSidebar && (
         <div
           className={`${
@@ -292,9 +285,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Mobile Header - only show if there's chat history */}
         {chatHistory.length > 0 && (
           <div className="lg:hidden flex items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
             <button
@@ -304,7 +295,7 @@ export default function HomePage() {
               <Menu className="w-5 h-5" />
             </button>
             <h1 className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
-              Ask me about Suresh
+              Ask me about Suresh Kumar Mukhiya
             </h1>
           </div>
         )}
@@ -604,7 +595,6 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* Uncomment the line below to enable follow-up questions admin panel */}
       <FollowUpQuestionsAdmin />
     </div>
   );
