@@ -288,19 +288,23 @@ export function analyzeIntent(query: string): IntentResult {
   for (const pattern of INTENT_PATTERNS) {
     let score = 0;
 
-    // Keyword matching
+    // Keyword matching - give higher score if at least one keyword matches
     const keywordMatches = pattern.keywords.filter((keyword) =>
       queryLower.includes(keyword)
     ).length;
-    score += (keywordMatches / pattern.keywords.length) * 0.4;
+    if (keywordMatches > 0) {
+      score += Math.min(keywordMatches / pattern.keywords.length * 2, 1) * 0.4;
+    }
 
-    // Phrase matching
+    // Phrase matching - give full score if any phrase matches
     const phraseMatches = pattern.phrases.filter((phrase) =>
       queryLower.includes(phrase.toLowerCase())
     ).length;
-    score += (phraseMatches / pattern.phrases.length) * 0.3;
+    if (phraseMatches > 0) {
+      score += 0.3; // Full phrase matching score
+    }
 
-    // NLP checks
+    // NLP checks - give higher score for partial matches
     const nlpMatches = pattern.nlpChecks.filter((check) => {
       try {
         return check(doc);
@@ -308,7 +312,9 @@ export function analyzeIntent(query: string): IntentResult {
         return false;
       }
     }).length;
-    score += (nlpMatches / pattern.nlpChecks.length) * 0.3;
+    if (nlpMatches > 0) {
+      score += Math.min(nlpMatches / pattern.nlpChecks.length * 1.5, 1) * 0.3;
+    }
 
     // Apply weight
     score *= pattern.weight;

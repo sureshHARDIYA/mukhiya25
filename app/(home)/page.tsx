@@ -141,12 +141,6 @@ export default function HomePage() {
         requiresEmail: response.requiresEmail,
       };
 
-      console.log('🔍 Debug - Adding bot response:', {
-        id: botResponse.id,
-        text: botResponse.text.substring(0, 50) + '...',
-        messagesLengthBefore: updatedMessages.length
-      });
-
       const finalMessages = [...updatedMessages, botResponse];
       setMessages(finalMessages);
 
@@ -204,7 +198,6 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen max-h-screen bg-white dark:bg-gray-900">
-      {/* Sidebar - only show if there's chat history or explicitly opened */}
       {shouldShowSidebar && (
         <div
           className={`${
@@ -292,9 +285,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Mobile Header - only show if there's chat history */}
         {chatHistory.length > 0 && (
           <div className="lg:hidden flex items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
             <button
@@ -304,7 +295,7 @@ export default function HomePage() {
               <Menu className="w-5 h-5" />
             </button>
             <h1 className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
-              Ask me about Suresh
+              Ask me about Suresh Kumar Mukhiya
             </h1>
           </div>
         )}
@@ -351,112 +342,34 @@ export default function HomePage() {
               {messages.length > 0 && (
                 <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-6">
                   {messages.map((message) => {
-                    console.log('🔍 Rendering message:', { id: message.id, isUser: message.isUser, text: message.text.substring(0, 50) });
+                    console.log("🔍 Rendering message:", {
+                      id: message.id,
+                      isUser: message.isUser,
+                      text: message.text.substring(0, 50),
+                    });
                     return (
-                    <div
-                      key={message.id}
-                      className={`flex gap-4 ${
-                        message.isUser ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      {!message.isUser && (
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Bot className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-
                       <div
-                        className={`max-w-4xl ${message.isUser ? "ml-12" : ""}`}
+                        key={message.id}
+                        className={`flex gap-4 ${
+                          message.isUser ? "justify-end" : "justify-start"
+                        }`}
                       >
-                        {message.isUser ? (
-                          <div className="bg-blue-500 text-white rounded-2xl px-4 py-3">
-                            <p className="whitespace-pre-wrap">
-                              {message.text}
-                            </p>
-                            <p className="text-xs opacity-70 mt-2">
-                              {message.timestamp.toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
+                        {!message.isUser && (
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Bot className="w-4 h-4 text-white" />
                           </div>
-                        ) : (
-                          <div>
-                            {/* Text response */}
-                            <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl px-4 py-3 mb-2">
-                              <div className="markdown-content">
-                                <ReactMarkdown
-                                  key={message.id} // Force re-render for each message
-                                  disallowedElements={[
-                                    "script",
-                                    "style",
-                                    "iframe",
-                                    "object",
-                                    "embed",
-                                    "form",
-                                    "input",
-                                    "textarea",
-                                  ]}
-                                  unwrapDisallowed={true}
-                                  components={{
-                                    p: ({ children }) => (
-                                      <p className="whitespace-pre-wrap mb-2 last:mb-0">
-                                        {children}
-                                      </p>
-                                    ),
-                                    a: ({ href, children }) => {
-                                      // Sanitize links to prevent javascript: and data: URLs
-                                      const isValidUrl =
-                                        href &&
-                                        (href.startsWith("http://") ||
-                                          href.startsWith("https://") ||
-                                          href.startsWith("mailto:") ||
-                                          href.startsWith("/"));
+                        )}
 
-                                      if (!isValidUrl) {
-                                        return (
-                                          <span className="text-gray-600">
-                                            {children}
-                                          </span>
-                                        );
-                                      }
-
-                                      return (
-                                        <a
-                                          href={href}
-                                          className="text-blue-600 hover:text-blue-800 underline"
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                        >
-                                          {children}
-                                        </a>
-                                      );
-                                    },
-                                    strong: ({ children }) => (
-                                      <strong className="font-semibold">
-                                        {children}
-                                      </strong>
-                                    ),
-                                    em: ({ children }) => (
-                                      <em className="italic">{children}</em>
-                                    ),
-                                    code: ({ children }) => (
-                                      <code className="bg-gray-200 dark:bg-gray-600 text-red-600 dark:text-red-400 px-1 py-0.5 rounded text-sm font-mono">
-                                        {children}
-                                      </code>
-                                    ),
-                                  }}
-                                >
-                                  {message.text}
-                                </ReactMarkdown>
-                              </div>
-                              {/* Debug info - remove in production */}
-                              {process.env.NODE_ENV === "development" && (
-                                <div className="text-xs text-gray-500 mt-2 border-t pt-1">
-                                  Type: {message.type || "undefined"} | Text
-                                  length: {message.text?.length || 0}
-                                </div>
-                              )}
+                        <div
+                          className={`max-w-4xl ${
+                            message.isUser ? "ml-12" : ""
+                          }`}
+                        >
+                          {message.isUser ? (
+                            <div className="bg-blue-500 text-white rounded-2xl px-4 py-3">
+                              <p className="whitespace-pre-wrap">
+                                {message.text}
+                              </p>
                               <p className="text-xs opacity-70 mt-2">
                                 {message.timestamp.toLocaleTimeString([], {
                                   hour: "2-digit",
@@ -464,74 +377,158 @@ export default function HomePage() {
                                 })}
                               </p>
                             </div>
+                          ) : (
+                            <div>
+                              {/* Text response */}
+                              <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-2xl px-4 py-3 mb-2">
+                                <div className="markdown-content">
+                                  <ReactMarkdown
+                                    key={message.id} // Force re-render for each message
+                                    disallowedElements={[
+                                      "script",
+                                      "style",
+                                      "iframe",
+                                      "object",
+                                      "embed",
+                                      "form",
+                                      "input",
+                                      "textarea",
+                                    ]}
+                                    unwrapDisallowed={true}
+                                    components={{
+                                      p: ({ children }) => (
+                                        <p className="whitespace-pre-wrap mb-2 last:mb-0">
+                                          {children}
+                                        </p>
+                                      ),
+                                      a: ({ href, children }) => {
+                                        // Sanitize links to prevent javascript: and data: URLs
+                                        const isValidUrl =
+                                          href &&
+                                          (href.startsWith("http://") ||
+                                            href.startsWith("https://") ||
+                                            href.startsWith("mailto:") ||
+                                            href.startsWith("/"));
 
-                            {/* Rich response component - only for responses with structured data */}
-                            {message.type === "predefined" &&
-                              message.data &&
-                              message.data.type !== "text" && (
-                                <RichResponse responseData={message.data} />
-                              )}
+                                        if (!isValidUrl) {
+                                          return (
+                                            <span className="text-gray-600">
+                                              {children}
+                                            </span>
+                                          );
+                                        }
 
-                            {/* Follow-up questions */}
-                            {message.followUpQuestions &&
-                              message.followUpQuestions.length > 0 && (
-                                <div className="mt-4">
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
-                                    💡 You might also want to ask:
-                                  </p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {message.followUpQuestions.map(
-                                      (question, index) => (
-                                        <button
-                                          key={index}
-                                          onClick={() =>
-                                            handleSendMessage(question)
-                                          }
-                                          className="inline-flex items-center px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group bg-white dark:bg-gray-800/30 flex-shrink-0"
-                                        >
-                                          <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300 whitespace-nowrap">
-                                            {question}
-                                          </span>
-                                        </button>
-                                      )
-                                    )}
-                                  </div>
+                                        return (
+                                          <a
+                                            href={href}
+                                            className="text-blue-600 hover:text-blue-800 underline"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                          >
+                                            {children}
+                                          </a>
+                                        );
+                                      },
+                                      strong: ({ children }) => (
+                                        <strong className="font-semibold">
+                                          {children}
+                                        </strong>
+                                      ),
+                                      em: ({ children }) => (
+                                        <em className="italic">{children}</em>
+                                      ),
+                                      code: ({ children }) => (
+                                        <code className="bg-gray-200 dark:bg-gray-600 text-red-600 dark:text-red-400 px-1 py-0.5 rounded text-sm font-mono">
+                                          {children}
+                                        </code>
+                                      ),
+                                    }}
+                                  >
+                                    {message.text}
+                                  </ReactMarkdown>
                                 </div>
-                              )}
+                                {/* Debug info - remove in production */}
+                                {process.env.NODE_ENV === "development" && (
+                                  <div className="text-xs text-gray-500 mt-2 border-t pt-1">
+                                    Type: {message.type || "undefined"} | Text
+                                    length: {message.text?.length || 0}
+                                  </div>
+                                )}
+                                <p className="text-xs opacity-70 mt-2">
+                                  {message.timestamp.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </p>
+                              </div>
 
-                            {/* Email collector for custom questions */}
-                            {message.requiresEmail && (
-                              <EmailCollector
-                                question={
-                                  messages[messages.indexOf(message) - 1]
-                                    ?.text || ""
-                                }
-                                onSubmit={(email) => {
-                                  console.log("Email submitted:", email);
-                                  // Save the question with email
-                                  saveCustomQuestion(
+                              {/* Rich response component - only for responses with structured data */}
+                              {message.type === "predefined" &&
+                                message.data &&
+                                message.data.type !== "text" && (
+                                  <RichResponse responseData={message.data} />
+                                )}
+
+                              {/* Follow-up questions */}
+                              {message.followUpQuestions &&
+                                message.followUpQuestions.length > 0 && (
+                                  <div className="mt-4">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
+                                      💡 You might also want to ask:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {message.followUpQuestions.map(
+                                        (question, index) => (
+                                          <button
+                                            key={index}
+                                            onClick={() =>
+                                              handleSendMessage(question)
+                                            }
+                                            className="inline-flex items-center px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 group bg-white dark:bg-gray-800/30 flex-shrink-0"
+                                          >
+                                            <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-700 dark:group-hover:text-blue-300 whitespace-nowrap">
+                                              {question}
+                                            </span>
+                                          </button>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                              {/* Email collector for custom questions */}
+                              {message.requiresEmail && (
+                                <EmailCollector
+                                  question={
                                     messages[messages.indexOf(message) - 1]
-                                      ?.text || "",
-                                    email
-                                  );
-                                  // You can add a success message here
-                                }}
-                                onSkip={() => {
-                                  console.log("Email collection skipped");
-                                  // Just continue the conversation
-                                }}
-                              />
-                            )}
+                                      ?.text || ""
+                                  }
+                                  onSubmit={(email) => {
+                                    console.log("Email submitted:", email);
+                                    // Save the question with email
+                                    saveCustomQuestion(
+                                      messages[messages.indexOf(message) - 1]
+                                        ?.text || "",
+                                      email
+                                    );
+                                    // You can add a success message here
+                                  }}
+                                  onSkip={() => {
+                                    console.log("Email collection skipped");
+                                    // Just continue the conversation
+                                  }}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {message.isUser && (
+                          <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                           </div>
                         )}
                       </div>
-
-                      {message.isUser && (
-                        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                        </div>
-                      )}
-                    </div>
                     );
                   })}
 
@@ -598,7 +595,6 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* Uncomment the line below to enable follow-up questions admin panel */}
       <FollowUpQuestionsAdmin />
     </div>
   );

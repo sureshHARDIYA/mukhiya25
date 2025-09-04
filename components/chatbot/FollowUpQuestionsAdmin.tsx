@@ -1,6 +1,3 @@
-// Admin Component for Managing Follow-up Questions AND Answers
-// Add this component to easily configure follow-up questions with their answers
-
 "use client";
 
 import React, { useState } from "react";

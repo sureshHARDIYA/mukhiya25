@@ -6,11 +6,13 @@
     "build": "next build",
     "dev": "next dev --turbo",
     "start": "next start",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "node scripts/install-esbuild.cjs && fumadocs-mdx",
+    "netlify-build": "npm install @esbuild/linux-x64 --no-save && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.0",
+    "@tailwindcss/postcss": "^4.1.12",
     "@tailwindcss/typography": "^0.5.16",
     "@types/bcryptjs": "^2.4.6",
     "@uiw/react-markdown-preview": "^5.1.5",
@@ -24,21 +26,29 @@
     "keyword-extractor": "^0.0.28",
     "lucide-react": "^0.537.0",
     "next": "15.4.5",
+    "postcss": "^8.5.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
     "@types/bad-words": "^3.0.3",
     "@types/mdx": "^2.0.13",
     "@types/node": "24.1.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "esbuild": "^0.24.2",
     "eslint": "^8",
     "eslint-config-next": "15.4.5",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2"
+  },
+  "optionalDependencies": {
+    "@esbuild/darwin-arm64": "^0.24.2",
+    "@esbuild/darwin-x64": "^0.24.2",
+    "@esbuild/linux-arm64": "^0.24.2",
+    "@esbuild/linux-x64": "^0.24.2",
+    "@esbuild/win32-arm64": "^0.24.2",
+    "@esbuild/win32-ia32": "^0.24.2",
+    "@esbuild/win32-x64": "^0.24.2"
   }
 }

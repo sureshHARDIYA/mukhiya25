@@ -1,0 +1,27 @@
+[build]
+  command = "bash scripts/netlify-build.sh"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--include=optional --include=dev"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Remove build processing for Next.js - let the plugin handle it
+[build.processing]
+  skip_processing = true
+
+# Remove custom redirects for Next.js - let the plugin handle routing
+
+# Environment variables for production
+[context.production.environment]
+  NODE_ENV = "production"
+
+# Environment variables for deploy previews
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
+
+# Environment variables for branch deploys
+[context.branch-deploy.environment]
+  NODE_ENV = "production"
